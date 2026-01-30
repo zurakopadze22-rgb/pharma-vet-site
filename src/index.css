@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* სურვილისამებრ დაამატე ფონტი უკეთესი ვიზუალისთვის */
+body {
+  font-family: 'Inter', sans-serif;
+}
