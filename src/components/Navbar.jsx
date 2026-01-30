@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Globe, X, Handshake } from 'lucide-react';
+import { Menu, Globe, X, Handshake, BookOpen } from 'lucide-react';
 
 const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) => {
   
@@ -13,11 +13,10 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           
-          {/* Logo Section - აქ შევცვალეთ კლასები */}
+          {/* Logo Section */}
           <div className="flex items-center gap-3 md:gap-6 cursor-pointer group" onClick={() => handleNavClick('home')}>
             <img src="/logo.png" alt="Logo" className="h-10 md:h-16 object-contain" />
             
-            {/* ლოზუნგი: ახლა ჩანს მობილურზეც (flex), ოღონდ უფრო პატარა ტექსტით (text-[9px]) */}
             <div className="flex flex-col border-l border-slate-200 pl-3 md:pl-6 text-[9px] md:text-sm">
               <span className="font-black text-slate-950 uppercase tracking-tighter leading-none">
                 {t.slogan1 || "უკეთესი ხარისხი"}
@@ -30,13 +29,19 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8 items-center">
-            <button onClick={() => setView('products')} className={`text-[11px] font-black uppercase tracking-widest ${view === 'products' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            <button onClick={() => setView('products')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'products' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.products}
             </button>
-            <button onClick={() => setView('partners')} className={`text-[11px] font-black uppercase tracking-widest ${view === 'partners' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            <button onClick={() => setView('partners')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'partners' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.partners}
             </button>
-            <button onClick={() => setView('about')} className={`text-[11px] font-black uppercase tracking-widest ${view === 'about' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            
+            {/* ბლოგის ღილაკი (Desktop) */}
+            <button onClick={() => setView('blog')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'blog' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+              {t.blog}
+            </button>
+
+            <button onClick={() => setView('about')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'about' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.about}
             </button>
             
@@ -75,28 +80,32 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
       </div>
 
       {/* Mobile Menu Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 transition-all duration-300 ${isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
+      <div className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 transition-all duration-300 ${isMenuOpen ? 'max-h-[600px] opacity-100 shadow-xl' : 'max-h-0 opacity-0 invisible overflow-hidden'}`}>
         <div className="px-6 py-8 space-y-6">
           <div className="flex flex-col space-y-4">
-            <button onClick={() => handleNavClick('products')} className="text-left font-black uppercase tracking-widest text-sm text-slate-950">{t.products}</button>
-            <button onClick={() => handleNavClick('partners')} className="text-left font-black uppercase tracking-widest text-sm text-slate-950">{t.partners}</button>
-            <button onClick={() => handleNavClick('about')} className="text-left font-black uppercase tracking-widest text-sm text-slate-950">{t.about}</button>
+            <button onClick={() => handleNavClick('products')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'products' ? 'text-teal-600' : 'text-slate-950'}`}>{t.products}</button>
+            <button onClick={() => handleNavClick('partners')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'partners' ? 'text-teal-600' : 'text-slate-950'}`}>{t.partners}</button>
+            
+            {/* ბლოგის ღილაკი (Mobile) */}
+            <button onClick={() => handleNavClick('blog')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'blog' ? 'text-teal-600' : 'text-slate-950'}`}>{t.blog}</button>
+            
+            <button onClick={() => handleNavClick('about')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'about' ? 'text-teal-600' : 'text-slate-950'}`}>{t.about}</button>
           </div>
           
           <button 
             onClick={() => handleNavClick('become-partner')}
-            className="w-full flex items-center justify-center gap-3 bg-teal-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs"
+            className="w-full flex items-center justify-center gap-3 bg-teal-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-teal-100"
           >
             <Handshake className="w-5 h-5" />
             {lang === 'GE' ? 'გახდი პარტნიორი' : lang === 'EN' ? 'Become a Partner' : 'Стать партнером'}
           </button>
 
-          <div className="flex justify-center gap-8">
+          <div className="flex justify-center gap-8 border-t pt-6 border-slate-50">
             {['GE', 'EN', 'RU'].map((l) => (
               <button 
                 key={l}
                 onClick={() => { setLang(l); setIsMenuOpen(false); }}
-                className={`text-sm font-black ${lang === l ? 'text-teal-600' : 'text-slate-400'}`}
+                className={`text-sm font-black transition-colors ${lang === l ? 'text-teal-600' : 'text-slate-400'}`}
               >
                 {l}
               </button>

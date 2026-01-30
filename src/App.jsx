@@ -11,6 +11,8 @@ import TrustSection from './components/TrustSection';
 import BrandsSlider from './components/BrandsSlider'; 
 import PartnerDetail from './components/PartnerDetail';
 import BecomePartner from './components/BecomePartner';
+import Blog from './components/Blog';
+import BlogDetail from './components/BlogDetail'; // <-- აუცილებლად დაამატეთ ეს იმპორტი
 
 import { translations } from './translations';
 import { productsData } from './data/products';
@@ -20,25 +22,28 @@ const App = () => {
   const [lang, setLang] = useState('GE'); 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
-  
-  // მობილური მენიუს კონტროლი
+  const [selectedArticle, setSelectedArticle] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
   const t = translations[lang]; 
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [view, selectedProduct]);
+  }, [view, selectedProduct, selectedArticle]);
 
   const openProduct = (product) => {
     setSelectedProduct(product);
     setView('product-detail');
   };
 
+  const openArticle = (article) => {
+    setSelectedArticle(article);
+    setView('blog-detail'); // გადავდივართ დეტალურ ხედზე
+  };
+
   const handlePartnerClick = (partner) => {
     setSelectedPartner(partner);
     setView('partner-detail');
-    window.scrollTo(0, 0);
   };
 
   return (
@@ -49,8 +54,8 @@ const App = () => {
         lang={lang} 
         setLang={setLang} 
         t={t.navbar} 
-        isMenuOpen={isMenuOpen}       // გადავცემთ მნიშვნელობას
-        setIsMenuOpen={setIsMenuOpen} // გადავცემთ ფუნქციას
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
       />
 
       <main>
@@ -63,13 +68,21 @@ const App = () => {
           </>
         )}
 
-        {view === 'products' && (
-          <ProductCatalog 
-            t={t.catalog} 
+        {view === 'blog' && (
+          <Blog lang={lang} t={t} onArticleClick={openArticle} />
+        )}
+
+        {view === 'blog-detail' && (
+          <BlogDetail 
+            article={selectedArticle} 
             lang={lang} 
-            allProducts={productsData}
-            onProductClick={openProduct} 
+            t={t} 
+            onBack={() => setView('blog')} 
           />
+        )}
+
+        {view === 'products' && (
+          <ProductCatalog t={t.catalog} lang={lang} allProducts={productsData} onProductClick={openProduct} />
         )}
 
         {view === 'product-detail' && (
@@ -79,34 +92,13 @@ const App = () => {
             lang={lang}
             t={t.detail} 
             onProductClick={openProduct}
-            onBack={() => setView('home')} 
+            onBack={() => setView('products')} 
           />
         )}
 
-        {view === 'partners' && (
-          <Partners 
-            lang={lang} 
-            t={t.partners} 
-            onPartnerClick={handlePartnerClick} 
-          />
-        )}
-
-        {view === 'partner-detail' && (
-          <PartnerDetail 
-            partner={selectedPartner} 
-            lang={lang} 
-            t={t.partners} 
-            onBack={() => setView('partners')} 
-          />
-        )}
-
-        {view === 'become-partner' && (
-          <BecomePartner 
-            lang={lang} 
-            t={t.becomePartner} 
-          />
-        )}
-
+        {view === 'partners' && <Partners lang={lang} t={t.partners} onPartnerClick={handlePartnerClick} />}
+        {view === 'partner-detail' && <PartnerDetail partner={selectedPartner} lang={lang} t={t.partners} onBack={() => setView('partners')} />}
+        {view === 'become-partner' && <BecomePartner lang={lang} t={t.becomePartner} />}
         {view === 'about' && <AboutUs t={t.about} lang={lang} />}
       </main>
 

@@ -4,6 +4,7 @@ export const translations = {
       products: "პროდუქცია", 
       partners: "პარტნიორები", 
       about: "ჩვენ შესახებ", 
+      blog: "ბლოგი",
       become_partner: "გახდი პარტნიორი",
       slogan1: "უკეთესი ხარისხი", 
       slogan2: "უკეთეს ფასად" 
@@ -99,6 +100,7 @@ export const translations = {
     navbar: { 
       products: "Products", 
       partners: "Partners", 
+      blog: "Blog",
       about: "About Us", 
       become_partner: "Become a Partner",
       slogan1: "Better Quality", 
@@ -195,6 +197,7 @@ export const translations = {
     navbar: { 
       products: "Продукция", 
       partners: "Партнеры", 
+      blog: "Блог",
       about: "О нас", 
       become_partner: "Стать партнером",
       slogan1: "Лучшее качество", 
