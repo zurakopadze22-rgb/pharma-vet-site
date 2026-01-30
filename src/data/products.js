@@ -888,58 +888,5 @@ TYLOGENTA PLUS — быстро всасывающееся бактериост�
     purpose: { GE: "ბეწვისა და კანის ჯანმრთელობისთვის.", EN: "For coat and skin health.", RU: "Для здоровья шерсти и кожи." },
     usage: { GE: "დაამატეთ საკვებში.", EN: "Add to food.", RU: "Добавлять в корм." }
   },
-  { 
-    id: 13, 
-    name: { GE: "Senior Cat Mix", EN: "Senior Cat Mix", RU: "Сеньор Кот Микс" }, 
-    category: "nutrition", sub: "dry_food", price: 55.0, manufacturer: "NatureFeed", 
-    image: "https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?q=80&w=400",
-    volume: { GE: "3 კგ", EN: "3 kg", RU: "3 кг" },
-    purpose: { GE: "ხანდაზმული კატების კვება.", EN: "Nutrition for senior cats.", RU: "Питание для пожилых кошек." },
-    usage: { GE: "თავისუფალი წვდომა საკვებთან.", EN: "Free access to food.", RU: "Свободный доступ к корму." }
-  },
-  { 
-    id: 14, 
-    name: { GE: "კალციუმი + D3", EN: "Calcium + D3", RU: "Кальций + D3" }, 
-    category: "nutrition", sub: "supplement", price: 25.0, manufacturer: "HealthPet", 
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=400",
-    volume: { GE: "100 აბი", EN: "100 tabs", RU: "100 таб" },
-    purpose: { GE: "ძვლოვანი სისტემის გაძლიერება.", EN: "Strengthening the skeletal system.", RU: "Укрепление костной системы." },
-    usage: { GE: "ყოველდღიურად საკვებთან ერთად.", EN: "Daily with food.", RU: "Ежедневно во время еды." }
-  },
-  { 
-    id: 15, 
-    name: { GE: "Hypoallergenic Dog", EN: "Hypoallergenic Dog", RU: "Гипоаллергенная собака" }, 
-    category: "nutrition", sub: "dry_food", price: 130.0, manufacturer: "NatureFeed", 
-    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400",
-    volume: { GE: "12 კგ", EN: "12 kg", RU: "12 кг" },
-    purpose: { GE: "ალერგიული ძაღლებისთვის.", EN: "For allergic dogs.", RU: "Для собак с аллергией." },
-    usage: { GE: "მხოლოდ მშრალი სახით.", EN: "Dry use only.", RU: "Только в сухом виде." }
-  },
-  { 
-    id: 16, 
-    name: { GE: "მულტივიტამინური სიროფი", EN: "Multivitamin Syrup", RU: "Мультивитаминный сироп" }, 
-    category: "pharma", sub: "vitamin", price: 29.0, manufacturer: "VetiCare", 
-    image: "https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?q=80&w=400",
-    volume: { GE: "200 მლ", EN: "200 ml", RU: "200 мл" },
-    purpose: { GE: "იმუნიტეტის ასამაღლებლად.", EN: "To boost immunity.", RU: "Для повышения иммунитета." },
-    usage: { GE: "პერორალურად (პირიდან).", EN: "Orally.", RU: "Перорально." }
-  },
-  { 
-    id: 17, 
-    name: { GE: "ენერჯი პასტა", EN: "Energy Paste", RU: "Энергетическая паста" }, 
-    category: "nutrition", sub: "supplement", price: 38.0, manufacturer: "BioVet", 
-    image: "https://images.unsplash.com/photo-1611928482473-7b27d24eab80?q=80&w=400",
-    volume: { GE: "100 გრ", EN: "100 g", RU: "100 г" },
-    purpose: { GE: "აღდგენითი პერიოდისთვის.", EN: "For the recovery period.", RU: "Для восстановительного периода." },
-    usage: { GE: "მიეცით პირდაპირ პირიდან.", EN: "Give directly by mouth.", RU: "Давать прямо в рот." }
-  },
-  { 
-    id: 18, 
-    name: { GE: "Betadine Vet Solution", EN: "Betadine Vet Solution", RU: "Бетадин Вет Раствор" }, 
-    category: "pharma", sub: "parasite", price: 14.0, manufacturer: "PharmVet", 
-    image: "https://plus.unsplash.com/premium_photo-1663045973501-11910620f4f9?q=80&w=400",
-    volume: { GE: "100 მლ", EN: "100 ml", RU: "100 мл" },
-    purpose: { GE: "ჭრილობების დასამუშავებლად.", EN: "For wound treatment.", RU: "Для обработки ран." },
-    usage: { GE: "გარეგანი გამოყენებისთვის.", EN: "For external use.", RU: "Для наружного применения." }
-  }
+  
 ];

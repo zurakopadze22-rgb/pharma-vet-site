@@ -9,10 +9,9 @@ import AboutUs from './components/AboutUs';
 import Footer from './components/Footer';
 import TrustSection from './components/TrustSection'; 
 import BrandsSlider from './components/BrandsSlider'; 
-import PartnerDetail from './components/PartnerDetail'; // <--- ეს აუცილებელია!
+import PartnerDetail from './components/PartnerDetail';
 import BecomePartner from './components/BecomePartner';
 
-// იმპორტები გარე ფაილებიდან
 import { translations } from './translations';
 import { productsData } from './data/products';
 
@@ -21,6 +20,9 @@ const App = () => {
   const [lang, setLang] = useState('GE'); 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
+  
+  // მობილური მენიუს კონტროლი
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
   const t = translations[lang]; 
 
@@ -28,14 +30,14 @@ const App = () => {
     window.scrollTo(0, 0);
   }, [view, selectedProduct]);
 
-  // პროდუქტის დეტალური გვერდის გახსნა
   const openProduct = (product) => {
     setSelectedProduct(product);
     setView('product-detail');
   };
+
   const handlePartnerClick = (partner) => {
-    setSelectedPartner(partner); // ვიმახსოვრებთ რომელ პარტნიორს დააჭირეს
-    setView('partner-detail');   // გადავდივართ დეტალურ გვერდზე
+    setSelectedPartner(partner);
+    setView('partner-detail');
     window.scrollTo(0, 0);
   };
 
@@ -47,6 +49,8 @@ const App = () => {
         lang={lang} 
         setLang={setLang} 
         t={t.navbar} 
+        isMenuOpen={isMenuOpen}       // გადავცემთ მნიშვნელობას
+        setIsMenuOpen={setIsMenuOpen} // გადავცემთ ფუნქციას
       />
 
       <main>
@@ -54,12 +58,11 @@ const App = () => {
           <>
             <Hero t={t.hero} setView={setView} />
             <Shop t={t.shop} lang={lang} products={productsData} onProductClick={openProduct} />
-            <TrustSection lang={lang} /> {/* ნდობის სექცია Shop-ის ქვემოთ */}
-            <BrandsSlider lang={lang} /> {/* ბრენდები Hero-ს ქვემოთ */}
+            <TrustSection lang={lang} />
+            <BrandsSlider lang={lang} />
           </>
         )}
 
-        {/* სრული კატალოგის გვერდი */}
         {view === 'products' && (
           <ProductCatalog 
             t={t.catalog} 
@@ -69,7 +72,6 @@ const App = () => {
           />
         )}
 
-        {/* დეტალური გვერდი */}
         {view === 'product-detail' && (
           <ProductDetail 
             product={selectedProduct} 
@@ -81,29 +83,30 @@ const App = () => {
           />
         )}
 
-        {/* სხვა გვერდები */}
         {view === 'partners' && (
-        <Partners 
-          lang={lang} 
-          t={t.partners} 
-          onPartnerClick={handlePartnerClick} 
-        />
-      )}
+          <Partners 
+            lang={lang} 
+            t={t.partners} 
+            onPartnerClick={handlePartnerClick} 
+          />
+        )}
 
-      {view === 'partner-detail' && (
-        <PartnerDetail 
-          partner={selectedPartner} 
-          lang={lang} 
-          t={t.partners} 
-          onBack={() => setView('partners')} 
-        />
-      )}
-      {view === 'become-partner' && (
+        {view === 'partner-detail' && (
+          <PartnerDetail 
+            partner={selectedPartner} 
+            lang={lang} 
+            t={t.partners} 
+            onBack={() => setView('partners')} 
+          />
+        )}
+
+        {view === 'become-partner' && (
           <BecomePartner 
             lang={lang} 
             t={t.becomePartner} 
           />
         )}
+
         {view === 'about' && <AboutUs t={t.about} lang={lang} />}
       </main>
 
