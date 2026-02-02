@@ -31,7 +31,7 @@ export const translations = {
       sub_vitamin: "ვიტამინი", 
       sub_parasite: "ანტიპარაზიტული", 
       sub_dry_food: "მშრალი საკვები", 
-      sub_supplement: "დანამატი",
+      sub_supplement: "საკვები დანამატი",
       species_all: "ყველა ცხოველი",
       species_dog: "ძაღლი",
       species_cat: "კატა",

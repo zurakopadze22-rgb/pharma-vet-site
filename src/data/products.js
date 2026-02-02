@@ -879,14 +879,185 @@ TYLOGENTA PLUS — быстро всасывающееся бактериост�
 Особенности: Содержит дипирон, который способствует лучшему всасыванию антибиотика и уменьшает отек тканей в месте инъекции.`
   }
 },
-  { 
-    id: 12, 
-    name: { GE: "Omega 3-6 Oil", EN: "Omega 3-6 Oil", RU: "Омега 3-6 Масло" }, 
-    category: "nutrition", sub: "supplement", price: 32.0, manufacturer: "BioVet", 
-    image: "https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=400",
-    volume: { GE: "250 მლ", EN: "250 ml", RU: "250 мл" },
-    purpose: { GE: "ბეწვისა და კანის ჯანმრთელობისთვის.", EN: "For coat and skin health.", RU: "Для здоровья шерсти и кожи." },
-    usage: { GE: "დაამატეთ საკვებში.", EN: "Add to food.", RU: "Добавлять в корм." }
+{
+  id: 11,
+  name: { 
+    GE: "CIPROFLOXACIN 20% ხსნარი", 
+    EN: "CIPROFLOXACIN 20% Solution", 
+    RU: "ЦИПРОФЛОКСАЦИН 20% Раствор" 
   },
+  category: "pharma",
+  sub: "antibiotic",
+  price: 120.0, // ფასი შეგიძლიათ შეცვალოთ
+  manufacturer: "NAPHAVET (GMP-WHO)",
+  exporter: "VMN Pharmaceuticals",
+  image: "/images/ciprofloxacin_20.webp",
+  
+  volume: { 
+    GE: "100 მლ / 1 ლ / 3 მლ", 
+    EN: "100 ml / 1 L / 3 ml", 
+    RU: "100 мл / 1 л / 3 мл" 
+  },
+  
+  purpose: { 
+    GE: "ფართო სპექტრის ანტიბიოტიკი კუჭ-ნაწლავის, სასუნთქი და საშარდე გზების ინფექციების სამკურნალოდ.", 
+    EN: "Broad-spectrum antibiotic for the treatment of gastrointestinal, respiratory, and urinary tract infections.", 
+    RU: "Антибиотик широкого спектра действия для лечения инфекций ЖКТ, дыхательных и мочевыводящих путей." 
+  },
+
+  usage: { 
+    GE: "ორალური ან საინექციო ხსნარი (ინსტრუქციის მიხედვით).", 
+    EN: "Oral or injectable solution (as per instructions).", 
+    RU: "Оральный или инъекционный раствор (согласно инструкции)." 
+  },
+
+  species: ['bird', 'livestock'],
+
+  fullDetails: { 
+    GE: `გამოყენების ჩვენებები:
+პრეპარატი გამოიყენება იმ მიკროორგანიზმებით გამოწვეული ინფექციების სამკურნალოდ, რომლებიც მგრძნობიარეა ციპროფლოქსაცინის მიმართ.
+
+სამიზნე სახეობები:
+• მცოხნავი ცხოველები (მსხვილფეხა რქოსანი პირუტყვი, ცხვარი, თხა).
+• ფრინველი.
+
+ეფექტურია შემდეგი გამომწვევების წინააღმდეგ:
+• Campylobacter, E. coli, Haemophilus.
+• Mycoplasma, Pasteurella.
+• Salmonella spp.
+
+გამოიყენება შემდეგი სისტემების სამკურნალოდ:
+• კუჭ-ნაწლავის ტრაქტი.
+• სასუნთქი გზები (რესპირატორული სისტემა).
+• საშარდე გზები.
+
+შემადგენლობა:
+• ყოველი 1 მლ შეიცავს 200 მგ ციპროფლოქსაცინს.`,
+
+    EN: `INDICATIONS:
+The product is indicated for the treatment of infections caused by microorganisms sensitive to ciprofloxacin.
+
+Target Species:
+• Ruminants (Cattle, Sheep, Goats).
+• Poultry.
+
+Effective against:
+• Campylobacter, E. coli, Haemophilus.
+• Mycoplasma, Pasteurella.
+• Salmonella spp.
+
+Used for the treatment of:
+• Gastrointestinal tract infections.
+• Respiratory tract infections.
+• Urinary tract infections.
+
+COMPOSITION:
+• Each 1 ml contains 200 mg of Ciprofloxacin.`,
+
+    RU: `ПОКАЗАНИЯ К ПРИМЕНЕНИЮ:
+Препарат показан для лечения инфекций, вызванных микроорганизмами, чувствительными к ципрофлоксацину.
+
+Целевые виды животных:
+• Жвачные животные (КРС, овцы, козы).
+• Птица.
+
+Эффективен против:
+• Campylobacter, E. coli, Haemophilus.
+• Mycoplasma, Pasteurella.
+• Salmonella spp.
+
+Применяется для лечения:
+• Инфекций желудочно-кишечного тракта.
+• Инфекций дыхательных путей.
+• Инфекций мочевыводящих путей.
+
+СОСТАВ:
+• В 1 мл содержится 200 мг ципрофлоксацина.`
+  }
+},
+  {
+  id: 12,
+  name: { 
+    GE: "VITA-B LIVER + საფუარის ექსტრაქტი", 
+    EN: "VITA-B LIVER + Yeast Extract", 
+    RU: "VITA-B LIVER + Экстракт дрожжей" 
+  },
+  category: "nutrition",
+  sub: "vitamin",
+  price: 38.0,
+  manufacturer: "NAPHAVET (GMP-WHO)",
+  exporter: "VMN Pharmaceuticals",
+  image: "/images/vita_b_liver.jpeg",
+  
+  volume: { 
+    GE: "100 მლ / 1 ლიტრი", 
+    EN: "100 ml / 1 Liter", 
+    RU: "100 мл / 1 литр" 
+  },
+  
+  purpose: { 
+    GE: "ღვიძლის დამცავი და იმუნიტეტის გამაძლიერებელი საკვები დანამატი სტრესული პირობების მიმართ მდგრადობისთვის.", 
+    EN: "Liver protectant and immune-boosting feed supplement for resilience against stressful conditions.", 
+    RU: "Пищевая добавка для защиты печени и укрепления иммунитета для устойчивости к стрессовым условиям." 
+  },
+
+  usage: { 
+    GE: "ორალური გზით (სასმელ წყალში შერევით).", 
+    EN: "Oral use (mixed with drinking water).", 
+    RU: "Пероральное применение (с питьевой водой)." 
+  },
+
+  species: ['bird', 'pig'],
+
+  fullDetails: { 
+    GE: `გამოყენების ინსტრუქცია:
+ეს არის ვიტამინების, პროვიტამინებისა და საფუარის კომბინირებული საკვები დანამატი. სტრატეგიული ვიტამინების დამატება მიზნად ისახავს ღვიძლის დაცვას.
+
+გამოიყენება შემდეგი მიზნებისთვის:
+• იმუნური ფუნქციის მხარდაჭერა.
+• ცხოველის ზრდისა და პროდუქტიულობის სტიმულირება.
+• საკვების ბიოშეღწევადობის გაზრდა.
+• ორგანიზმის მდგრადობა სტრესის მიმართ (გადანერგვა, ნისკარტის მოჭრა, ვაქცინაცია, სეზონური ცვლილებები).
+
+რეკომენდებული დოზირება:
+• ფრინველი: 1-2 მლ / 4 ლიტრ სასმელ წყალზე.
+• ღორები: 1-2 მლ / 4 ლიტრ სასმელ წყალზე.
+
+შემადგენლობა:
+ვიტამინი B1, ვიტამინი B2, ნიაცინი, ინოზიტოლი, ქოლინის ქლორიდი, L-კარნიტინი, ბეტაინის ჰიდროქლორიდი, კალციუმ-D-პანტოთენატი, სორბიტოლი, აქტიური საფუარის ექსტრაქტი (Saccharomyces cerevisiae).`,
+
+    EN: `DIRECTIONS FOR USE:
+A combined feed supplement of vitamins, provitamins, and yeast. The inclusion of strategic vitamins aims specifically at liver protection.
+
+Used for the following purposes:
+• Support of immune function.
+• Stimulation of animal growth and productivity.
+• Improvement of feed bioavailability.
+• Resilience to severe stress (relocation, beak trimming, vaccination, seasonal changes).
+
+RECOMMENDED DOSAGE:
+• Poultry: 1-2 ml / 4 Liters of drinking water.
+• Swine (Pigs): 1-2 ml / 4 Liters of drinking water.
+
+COMPOSITION:
+Vitamin B1, Vitamin B2, Niacin, Inositol, Choline Chloride, L-Carnitine, Betaine Hydrochloride, Calcium-D-Pantothenate, Sorbitol, Active Yeast Extract (Saccharomyces cerevisiae).`,
+
+    RU: `ИНСТРУКЦИЯ ПО ПРИМЕНЕНИЮ:
+Комбинированная кормовая добавка, состоящая из витаминов, провитаминов и дрожжей. Добавление стратегических витаминов направлено на защиту печени.
+
+Применяется для следующих целей:
+• Поддержка иммунной функции.
+• Стимуляция роста и продуктивности животных.
+• Повышение биодоступности кормов.
+• Устойчивость к тяжелым стрессовым условиям (пересадка, обрезка клюва, вакцинация, сезонные изменения).
+
+РЕКОМЕНДУЕМАЯ ДОЗИРОВКА:
+• Птица: 1-2 мл на 4 литра питьевой воды.
+• Свиньи: 1-2 мл на 4 литра питьевой воды.
+
+СОСТАВ:
+Витамин B1, Витамин B2, Ниацин, Инозитол, Холина хлорид, L-карнитин, Бетаина гидрохлорид, Кальция D-пантотенат, Сорбитол, Экстракт активных дрожжей (Saccharomyces cerevisiae).`
+  }
+}
   
 ];
