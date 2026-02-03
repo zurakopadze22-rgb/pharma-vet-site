@@ -6,19 +6,35 @@ const Blog = ({ lang, t, onArticleClick }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState("all");
 
+  // --- კატეგორიების თარგმანი ---
+  const categoryTranslations = {
+    health: { GE: "ჯანმრთელობა", EN: "Health", RU: "Здоровье" },
+    nutrition: { GE: "კვება", EN: "Nutrition", RU: "Питание" },
+    prevention: { GE: "პრევენცია", EN: "Prevention", RU: "Профилактика" },
+    tips: { GE: "რჩევები", EN: "Tips", RU: "Советы" },
+    care: { GE: "მოვლა", EN: "Care", RU: "Уход" }
+  };
+
   const speciesFilters = [
-    { id: 'all', label: lang === 'GE' ? 'ყველა' : 'All', icon: '🐾' },
-    { id: 'dog', label: lang === 'GE' ? 'ძაღლი' : 'Dog', icon: '🐕' },
-    { id: 'cat', label: lang === 'GE' ? 'კატა' : 'Cat', icon: '🐈' },
-    { id: 'livestock', label: lang === 'GE' ? 'ფერმა' : 'Farm', icon: '🐄' },
+    { id: 'all', label: lang === 'GE' ? 'ყველა' : lang === 'EN' ? 'All' : 'Все', icon: '🐾' },
+    { id: 'dog', label: lang === 'GE' ? 'ძაღლი' : lang === 'EN' ? 'Dog' : 'Собака', icon: '🐕' },
+    { id: 'cat', label: lang === 'GE' ? 'კატა' : lang === 'EN' ? 'Cat' : 'Кошка', icon: '🐈' },
+    { id: 'livestock', label: lang === 'GE' ? 'ფერმა' : lang === 'EN' ? 'Farm' : 'Ферма', icon: '🐄' },
   ];
 
   const filteredArticles = useMemo(() => {
     return blogArticles.filter(article => {
       const title = article.title[lang] || "";
       const excerpt = article.excerpt[lang] || "";
-      const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // აქ ვიღებთ კატეგორიის ნათარგმნ ვერსიას საძიებო სისტემისთვის
+      const categoryText = categoryTranslations[article.category]?.[lang] || article.category;
+      
+      const matchesSearch = 
+        title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        categoryText.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesSpecies = selectedSpecies === "all" || article.species === selectedSpecies;
       return matchesSearch && matchesSpecies;
     });
@@ -30,10 +46,10 @@ const Blog = ({ lang, t, onArticleClick }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
           <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">
-            {lang === 'GE' ? 'რჩევები და ბლოგი' : 'Tips & Blog'}
+            {lang === 'GE' ? 'რჩევები და ბლოგი' : lang === 'EN' ? 'Tips & Blog' : 'Советы и Блог'}
           </h1>
           <p className="text-slate-500 font-bold text-sm">
-            {lang === 'GE' ? 'პროფესიონალური რჩევები თქვენი ცხოველების ჯანმრთელობისთვის' : 'Professional advice for your pet\'s health'}
+            {lang === 'GE' ? 'პროფესიონალური რჩევები თქვენი ცხოველების ჯანმრთელობისთვის' : lang === 'EN' ? 'Professional advice for your pet\'s health' : 'Профессиональные советы'}
           </p>
         </div>
 
@@ -41,7 +57,7 @@ const Blog = ({ lang, t, onArticleClick }) => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input 
             type="text"
-            placeholder={lang === 'GE' ? "ძებნა სტატიებში..." : "Search articles..."}
+            placeholder={lang === 'GE' ? "ძებნა სტატიებში..." : lang === 'EN' ? "Search articles..." : "Поиск..."}
             className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:border-teal-500 outline-none transition-all font-bold text-sm shadow-sm"
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -69,7 +85,7 @@ const Blog = ({ lang, t, onArticleClick }) => {
         {filteredArticles.map((article) => (
           <article 
             key={article.id}
-            onClick={() => onArticleClick(article)} // <-- აი, აქ ხდება სტატიის გახსნა
+            onClick={() => onArticleClick(article)}
             className="group bg-white rounded-[2.5rem] border-2 border-slate-50 overflow-hidden hover:shadow-2xl hover:border-teal-100 transition-all duration-500 flex flex-col cursor-pointer"
           >
             <div className="relative aspect-[16/10] overflow-hidden">
@@ -78,8 +94,9 @@ const Blog = ({ lang, t, onArticleClick }) => {
                 alt={article.title[lang]}
                 className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
               />
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter text-teal-600">
-                {article.category}
+              {/* მრავალენოვანი ბეიჯი სურათზე (იყენებს თარგმნის ფუნქციას) */}
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter text-teal-600 border border-teal-100">
+                {categoryTranslations[article.category]?.[lang] || article.category}
               </div>
             </div>
 
@@ -88,14 +105,14 @@ const Blog = ({ lang, t, onArticleClick }) => {
                 <Calendar className="w-3 h-3" />
                 {article.date}
               </div>
-              <h3 className="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-teal-600 transition-colors">
+              <h3 className="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-teal-600 transition-colors uppercase tracking-tighter">
                 {article.title[lang]}
               </h3>
               <p className="text-slate-500 text-xs font-bold leading-relaxed mb-6 line-clamp-3">
                 {article.excerpt[lang]}
               </p>
               <button className="mt-auto flex items-center gap-2 text-teal-600 font-black text-[10px] uppercase tracking-widest group/btn">
-                {lang === 'GE' ? 'სრულად ნახვა' : 'Read More'}
+                {lang === 'GE' ? 'სრულად ნახვა' : lang === 'EN' ? 'Read More' : 'Читать далее'}
                 <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -107,7 +124,7 @@ const Blog = ({ lang, t, onArticleClick }) => {
         <div className="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
           <BookOpen className="w-12 h-12 text-slate-200 mx-auto mb-4" />
           <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">
-            {lang === 'GE' ? 'სტატიები ვერ მოიძებნა' : 'No articles found'}
+            {lang === 'GE' ? 'სტატიები ვერ მოიძებნა' : lang === 'EN' ? 'No articles found' : 'Статьи не найдены'}
           </p>
         </div>
       )}

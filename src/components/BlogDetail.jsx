@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, Tag, CheckCircle2, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, CheckCircle2, Lightbulb } from 'lucide-react';
 
 const BlogDetail = ({ article, lang, t, onBack }) => {
   const [copied, setCopied] = useState(false);
 
   if (!article) return null;
 
-  const shareUrl = window.location.href;
+  // --- კატეგორიების თარგმანი ---
+  const categoryTranslations = {
+    health: { GE: "ჯანმრთელობა", EN: "Health", RU: "Здоровье" },
+    nutrition: { GE: "კვება", EN: "Nutrition", RU: "Питание" },
+    prevention: { GE: "პრევენცია", EN: "Prevention", RU: "Профилактика" },
+    tips: { GE: "რჩევები", EN: "Tips", RU: "Советы" },
+    care: { GE: "მოვლა", EN: "Care", RU: "Уход" }
+  };
+
+  // ვიღებთ კატეგორიის ტექსტს მიმდინარე ენაზე
+  // თუ კატეგორია ვერ მოიძებნა სიაში, დატოვებს ისე როგორც არის (მაგ: "health")
+  const categoryLabel = categoryTranslations[article.category]?.[lang] || article.category;
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
   const shareTitle = article.title[lang];
 
   const shareLinks = {
@@ -21,6 +34,16 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getLabel = (key) => {
+    const labels = {
+      back: { GE: 'უკან ბლოგზე', EN: 'Back to Blog', RU: 'Назад в блог' },
+      tip: { GE: 'რჩევა', EN: 'Tip', RU: 'Совет' },
+      takeaways: { GE: 'მთავარი რეკომენდაციები', EN: 'Key Takeaways', RU: 'Основные выводы' },
+      share: { GE: 'გაუზიარეთ მეგობრებს', EN: 'Share with friends', RU: 'Поделиться' }
+    };
+    return labels[key][lang] || labels[key]['EN'];
+  };
+
   return (
     <div className="relative max-w-5xl mx-auto px-4 py-6 md:py-16 animate-in fade-in duration-1000">
       
@@ -33,13 +56,12 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
         className="group flex items-center gap-2 text-slate-400 hover:text-teal-600 font-black text-[10px] uppercase mb-8 md:mb-12 transition-all tracking-widest"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
-        {lang === 'GE' ? 'უკან ბლოგზე' : 'Back to Blog'}
+        {getLabel('back')}
       </button>
 
-      {/* მთავარი სექცია - მობილურზე სურათი ზემოთაა, ტექსტი ქვემოთ */}
       <div className="flex flex-col lg:grid lg:grid-cols-[320px_1fr] gap-8 lg:gap-12 items-start">
         
-        {/* სურათის ბლოკი - მობილურზე სტატიკურია, კომპიუტერზე სტიქი */}
+        {/* სურათის ბლოკი */}
         <div className="w-full lg:sticky lg:top-28">
           <div className="relative rounded-[2rem] rounded-bl-none overflow-hidden shadow-xl shadow-teal-100/20 transform lg:-rotate-1">
             <img 
@@ -53,7 +75,7 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
             <div className="mt-4 md:mt-6 bg-teal-50 rounded-2xl md:rounded-3xl p-5 border-l-4 border-teal-500 shadow-sm">
                <div className="flex items-center gap-2 text-teal-700 font-black text-[9px] uppercase mb-1">
                  <Lightbulb className="w-3.5 h-3.5" />
-                 {lang === 'GE' ? 'რჩევა' : 'Tip'}
+                 {getLabel('tip')}
                </div>
                <p className="text-teal-900/70 text-[11px] md:text-xs font-bold leading-relaxed italic">
                  {article.quickTip[lang]}
@@ -65,8 +87,9 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
         {/* კონტენტი */}
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-4 mb-4 md:mb-6">
+            {/* აქ ვიყენებთ გადათარგმნილ categoryLabel-ს */}
             <span className="bg-teal-600 text-white px-3 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest">
-              {article.category}
+              {categoryLabel}
             </span>
             <div className="flex items-center gap-2 text-slate-400 font-bold text-[9px] uppercase ml-auto">
               <Calendar className="w-3 h-3 text-teal-500" />
@@ -92,7 +115,7 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
               <div className="bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 mt-8 md:mt-12 shadow-xl shadow-slate-200">
                 <h4 className="text-base md:text-lg font-black text-teal-400 uppercase mb-4 md:mb-6 flex items-center gap-3">
                   <CheckCircle2 className="w-5 h-5" />
-                  {lang === 'GE' ? 'მთავარი რეკომენდაციები' : 'Key Takeaways'}
+                  {getLabel('takeaways')}
                 </h4>
                 <ul className="grid gap-3 md:gap-4">
                   {article.takeaways[lang].map((item, i) => (
@@ -109,38 +132,19 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
           {/* გაზიარება */}
           <div className="mt-12 md:mt-16 pt-8 border-t border-slate-100">
              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-4 md:mb-6">
-               {lang === 'GE' ? 'გაუზიარეთ მეგობრებს' : 'Share with friends'}
+               {getLabel('share')}
              </span>
              
              <div className="flex flex-wrap gap-2 md:gap-3">
-                <a 
-                  href={shareLinks.facebook} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-[#1877F2] text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
-                >
-                  <Facebook className="w-3.5 h-3.5 fill-current" />
-                  FB
+                <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#1877F2] text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg">
+                  <Facebook className="w-3.5 h-3.5 fill-current" /> FB
                 </a>
-
-                <a 
-                  href={shareLinks.whatsapp} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-[#25D366] text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
-                >
-                  <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                  WA
+                <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366] text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg">
+                  <MessageCircle className="w-3.5 h-3.5 fill-current" /> WA
                 </a>
-
-                <button 
-                  onClick={copyToClipboard}
-                  className={`flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg ${
-                    copied ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-600'
-                  }`}
-                >
+                <button onClick={copyToClipboard} className={`flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg ${copied ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied ? (lang === 'GE' ? 'OK' : 'Copied') : (lang === 'GE' ? 'LINK' : 'Link')}
+                  {copied ? 'OK' : 'LINK'}
                 </button>
              </div>
           </div>
