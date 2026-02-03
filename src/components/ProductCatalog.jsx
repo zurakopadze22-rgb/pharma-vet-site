@@ -10,14 +10,11 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
   const [isManOpen, setIsManOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // მწარმოებლების სია
   const manufacturers = useMemo(() => {
     const list = allProducts.map(p => p.manufacturer);
     return ['all', ...new Set(list)];
   }, [allProducts]);
 
-  // ქვეკატეგორიების გენერაცია არსებული პროდუქტებიდან
-  // ეს საშუალებას გვაძლევს ვნახოთ ყველა ქვეკატეგორია მაშინაც კი, როცა "ყველა" გვაქვს არჩეული
   const availableSubs = useMemo(() => {
     let subs = [];
     if (activeCategory === 'all') {
@@ -50,26 +47,43 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // გაუმჯობესებული ფილტრაციის ლოგიკა
+  // --- განახლებული "ღრმა ფილტრაციის" ლოგიკა ---
   const filteredProducts = useMemo(() => {
     return allProducts.filter(p => {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm.toLowerCase().trim();
       
-      // ძებნა სახელით, ბრენდით, კატეგორიით და ქვეკატეგორიით (უფრო მოქნილი ძებნა)
-      const matchesSearch = 
-        p.name[lang].toLowerCase().includes(term) || 
-        p.manufacturer.toLowerCase().includes(term) ||
-        (p.sub && t[`sub_${p.sub}`]?.toLowerCase().includes(term)) ||
-        t[p.category]?.toLowerCase().includes(term);
+      if (!term) {
+        // თუ ძებნა ცარიელია, მხოლოდ ფილტრებს ვადარებთ
+        const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+        const matchesSub = activeSub === 'all' || p.sub === activeSub;
+        const matchesMan = activeManufacturer === 'all' || p.manufacturer === activeManufacturer;
+        const matchesSpecies = activeSpecies === 'all' || (p.species && p.species.includes(activeSpecies));
+        return matchesCategory && matchesSub && matchesMan && matchesSpecies;
+      }
 
+      // 1. ძებნა სახელებში (სამივე ენაზე)
+      const inNames = Object.values(p.name || {}).some(val => val.toLowerCase().includes(term));
+      
+      // 2. ძებნა დანიშნულებაში (purpose) (სამივე ენაზე)
+      const inPurpose = Object.values(p.purpose || {}).some(val => val.toLowerCase().includes(term));
+      
+      // 3. ძებნა სრულ აღწერაში (fullDetails) (სამივე ენაზე)
+      const inDetails = Object.values(p.fullDetails || {}).some(val => val.toLowerCase().includes(term));
+      
+      // 4. ძებნა მწარმოებელში
+      const inManufacturer = p.manufacturer.toLowerCase().includes(term);
+
+      const matchesSearch = inNames || inPurpose || inDetails || inManufacturer;
+
+      // სხვა ფილტრები
       const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
       const matchesSub = activeSub === 'all' || p.sub === activeSub;
       const matchesMan = activeManufacturer === 'all' || p.manufacturer === activeManufacturer;
       const matchesSpecies = activeSpecies === 'all' || (p.species && p.species.includes(activeSpecies));
 
-      return matchesCategory && matchesSub && matchesMan && matchesSearch && matchesSpecies;
+      return matchesSearch && matchesCategory && matchesSub && matchesMan && matchesSpecies;
     });
-  }, [activeCategory, activeSub, activeManufacturer, activeSpecies, searchTerm, allProducts, lang, t]);
+  }, [activeCategory, activeSub, activeManufacturer, activeSpecies, searchTerm, allProducts, lang]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
@@ -82,8 +96,10 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
         <div className="relative w-full md:w-96 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 w-5 h-5 group-focus-within:scale-110 transition-transform" />
           <input 
-            type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={lang === 'GE' ? 'ძებნა (მაგ: ანტიბიოტიკი, ბრენდი...)' : 'Search products...'}
+            type="text" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={lang === 'GE' ? 'ძებნა (მაგ: სიცხე, ანტიბიოტიკი, ვიტამინი...)' : 'Search (e.g. fever, antibiotic, vitamin...)'}
             className="w-full bg-slate-50 border-2 border-teal-100 py-3.5 pl-12 pr-4 rounded-2xl font-bold text-sm focus:border-teal-500 focus:bg-white outline-none transition-all shadow-sm"
           />
         </div>
@@ -92,7 +108,6 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
       {/* ფილტრების პანელი */}
       <div className="space-y-4 mb-10">
         
-        {/* 1. ძირითადი კატეგორიები და მწარმოებელი */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
             {[{ id: 'all', label: t.all }, { id: 'pharma', label: t.pharma }, { id: 'nutrition', label: t.nutrition }].map(cat => (
@@ -122,7 +137,6 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
           </div>
         </div>
 
-        {/* 2. ქვეკატეგორიების "ჩიპსები" - ახლა უფრო მოქნილია */}
         {availableSubs.length > 1 && (
           <div className="flex flex-wrap gap-2 p-1.5 bg-teal-50/30 rounded-2xl border border-teal-100/50">
             {availableSubs.map(s => (
@@ -135,7 +149,6 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
           </div>
         )}
 
-        {/* 3. ცხოველების ფილტრი */}
         <div className="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-2xl border border-slate-100">
           {speciesFilters.map(s => (
             <button key={s.id} onClick={() => setActiveSpecies(s.id)}
@@ -163,6 +176,14 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
               <div className="p-5 flex flex-col flex-grow bg-slate-50/50 group-hover:bg-white transition-colors">
                 <span className="text-[8px] font-black text-teal-600 uppercase tracking-widest mb-2 px-2 py-0.5 bg-teal-50 rounded-full inline-block w-fit border border-teal-100">{p.manufacturer}</span>
                 <h3 className="text-[11px] md:text-[12px] font-black text-slate-900 mb-4 leading-tight line-clamp-2 min-h-[2.2rem] uppercase tracking-tighter">{p.name[lang]}</h3>
+                
+                {/* ძებნის დროს ვაჩვენებთ თუ დანიშნულებაში რამე დაემთხვა */}
+                {searchTerm && p.purpose[lang].toLowerCase().includes(searchTerm.toLowerCase()) && (
+                  <p className="text-[9px] text-slate-400 italic mb-4 line-clamp-1">
+                    ...{p.purpose[lang]}
+                  </p>
+                )}
+
                 <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-base font-black text-slate-950">{p.price.toFixed(1)} <span className="text-teal-600 text-xs italic font-bold">₾</span></span>
                   <div className="w-8 h-8 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 group-hover:bg-teal-500 group-hover:text-white transition-all shadow-sm border border-teal-100"><Info className="w-4 h-4" /></div>
@@ -174,6 +195,7 @@ const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
       ) : (
         <div className="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
           <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">პროდუქცია ვერ მოიძებნა</p>
+          <button onClick={() => {setSearchTerm(''); setActiveCategory('all');}} className="mt-4 text-teal-600 font-black text-[10px] uppercase underline">ფილტრების გასუფთავება</button>
         </div>
       )}
     </div>

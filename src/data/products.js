@@ -3,6 +3,7 @@ export const productsData = [
   // --- არსებული პროდუქტები ---
   {
   id: 1,
+  slug: "vn-ad3eck-oral-solution",
   name: { 
     GE: "VN-AD3ECK ხსნარი პერორალური მიღებისთვის", 
     EN: "VN-AD3ECK Oral solution", 
@@ -86,6 +87,7 @@ RECOMMENDED USAGE:
 },
   {
   id: 2, // ან შემდეგი რიგი ნომერი
+  slug: "phosdcal-vn-oral-solution",
   name: { 
     GE: "PHOSDCAL-VN ხსნარი პერორალური მიღებისთვის", 
     EN: "PHOSDCAL-VN Oral solution", 
@@ -171,6 +173,7 @@ Recommended treatment duration: 3-5 consecutive days.`,
 },
   {
   id: 3,
+  slug: "minacid-vn-oral-solution",
   name: { 
     GE: "MINACID-VN ხსნარი პერორალური მიღებისთვის", 
     EN: "MINACID-VN Oral solution", 
@@ -252,6 +255,7 @@ MINACID-VN представляет собой сбалансированную 
 
   {
   id: 4,
+  slug: "aminovit-oral-solution",
   name: { 
     GE: "AMINOVIT პერორალური ხსნარი", 
     EN: "AMINOVIT Oral solution", 
@@ -347,6 +351,7 @@ AMINOVIT рекомендуется в качестве вспомогатель
 },
   {
   id: 5, // მიანიჭე შემდეგი თავისუფალი ID
+  slug: "doxyflo-vm-oral-solution",
   name: { 
     GE: "DOXYFLO VM პერორალური ხსნარი", 
     EN: "DOXYFLO VM Oral solution", 
@@ -439,6 +444,7 @@ Available packaging: 2 g, 100 g, 1 L.`,
 },
   {
   id: 6,
+  slug: "phytores-vn-oral-solution",
   name: { 
     GE: "Phytores-VN პერორალური ხსნარი", 
     EN: "Phytores-VN Oral solution", 
@@ -522,6 +528,7 @@ Available packaging: 100 ml, 1 L.`,
 },
   {
   id: 7,
+  slug: "move-g-joint-support",
   name: { 
     GE: "MOVE+G სახსრების მხარდაჭერა", 
     EN: "MOVE+G Joint Support", 
@@ -596,6 +603,7 @@ MOVE+G применяется для укрепления суставов и з
 },
   {
   id: 8,
+  slug: "anti-hairball-malt-paste",
   name: { 
     GE: "თმის ბურთულების საწინააღმდეგო ალაოს პასტა", 
     EN: "Anti-Hairball Malt Paste", 
@@ -686,6 +694,7 @@ Shelf life: 2 years from production date.`,
   // --- ახალი პროდუქტები (ცხოველთა კვება) ---
   {
   id: 9,
+  slug: "calming-paste-cats-dogs",
   name: { 
     GE: "დამამშვიდებელი პასტა კატებისა და ძაღლებისთვის", 
     EN: "Calming Paste for Cats and Dogs", 
@@ -777,6 +786,7 @@ Shelf life: 2 years from production date.`,
 },
   {
   id: 10,
+  slug: "tylogenta-plus-injectable-solution",
   name: { 
     GE: "TYLOGENTA PLUS საინექციო ხსნარი", 
     EN: "TYLOGENTA PLUS Injectable Solution", 
@@ -881,6 +891,7 @@ TYLOGENTA PLUS — быстро всасывающееся бактериост�
 },
 {
   id: 11,
+  slug: "ciprofloxacin-20-solution",
   name: { 
     GE: "CIPROFLOXACIN 20% ხსნარი", 
     EN: "CIPROFLOXACIN 20% Solution", 
@@ -977,6 +988,7 @@ COMPOSITION:
 },
   {
   id: 12,
+  slug: "vita-b-liver-yeast-extract",
   name: { 
     GE: "VITA-B LIVER + საფუარის ექსტრაქტი", 
     EN: "VITA-B LIVER + Yeast Extract", 

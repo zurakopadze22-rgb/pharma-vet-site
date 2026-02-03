@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, CheckCircle2, Lightbulb } from 'lucide-react';
-
-const BlogDetail = ({ article, lang, t, onBack }) => {
+import { useParams } from 'react-router-dom'; // დაამატე ეს
+import { blogArticles } from '../data/blogData';
+const BlogDetail = ({ lang, t, onBack }) => {
+  const { slug } = useParams(); // URL-იდან იღებს slug-ს
   const [copied, setCopied] = useState(false);
 
-  if (!article) return null;
+  // ვპოულობთ შესაბამის სტატიას მასივში
+  const article = blogArticles.find(a => a.slug === slug);
+
+  if (!article) {
+    return (
+      <div className="text-center py-20">
+        <p>სტატია ვერ მოიძებნა</p>
+        <button onClick={onBack}>უკან დაბრუნება</button>
+      </div>
+    );
+  }
 
   // --- კატეგორიების თარგმანი ---
   const categoryTranslations = {
@@ -19,8 +31,10 @@ const BlogDetail = ({ article, lang, t, onBack }) => {
   // თუ კატეგორია ვერ მოიძებნა სიაში, დატოვებს ისე როგორც არის (მაგ: "health")
   const categoryLabel = categoryTranslations[article.category]?.[lang] || article.category;
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = article.title[lang];
+const shareUrl = typeof window !== 'undefined' 
+  ? `${window.location.origin}/blog/${article.slug}` 
+  : '';
+    const shareTitle = article.title[lang];
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,

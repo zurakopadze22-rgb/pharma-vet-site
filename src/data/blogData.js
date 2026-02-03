@@ -2,6 +2,7 @@ export const blogArticles = [
   {
     id: 1,
     date: "2026-01-30",
+    slug: "calves-diarrhea-prevention-treatment",
     species: "livestock",
     category: "health",
     image: "/images/1.webp",
@@ -18,6 +19,7 @@ export const blogArticles = [
   {
     id: 2,
     date: "2026-01-28",
+    slug: "vitamins-role-dog-immunity",
     species: "dog",
     category: "nutrition",
     image: "/images/2.webp",
@@ -34,6 +36,7 @@ export const blogArticles = [
   {
     id: 3,
     date: "2026-01-25",
+    slug: "mastitis-prevention-dairy-cattle",
     species: "livestock",
     category: "prevention",
     image: "/images/3.webp",
@@ -50,6 +53,7 @@ export const blogArticles = [
   {
     id: 4,
     date: "2026-01-22",
+    slug: "cat-kidney-disease-symptoms",
     species: "cat",
     category: "health",
     image: "/images/4.webp",
@@ -65,6 +69,7 @@ export const blogArticles = [
   },
   {
     id: 5,
+    slug: "coccidiosis-poultry-control",
     date: "2026-01-18",
     species: "livestock",
     category: "health",
@@ -81,6 +86,7 @@ export const blogArticles = [
   },
   {
     id: 6,
+    slug: "cattle-vaccination-schedule",
     date: "2026-01-15",
     species: "livestock",
     category: "prevention",
@@ -97,6 +103,7 @@ export const blogArticles = [
   },
   {
     id: 7,
+    slug: "tick-protection-methods-dogs",
     date: "2026-01-10",
     species: "dog",
     category: "safety",
@@ -113,6 +120,7 @@ export const blogArticles = [
   },
   {
     id: 8,
+    slug: "sheep-footrot-treatment",
     date: "2026-01-05",
     species: "livestock",
     category: "health",
@@ -129,6 +137,7 @@ export const blogArticles = [
   },
   {
     id: 9,
+    slug: "african-swine-fever-biosafety",
     date: "2026-01-02",
     species: "livestock",
     category: "prevention",
@@ -145,6 +154,7 @@ export const blogArticles = [
   },
   {
     id: 10,
+    slug: "puppy-care-first-100-days",
     date: "2026-01-01",
     species: "dog",
     category: "health",
@@ -162,6 +172,7 @@ export const blogArticles = [
 
   {
     id: 11,
+    slug: "bloat-cattle-nutritional-errors",
     date: "2026-02-05",
     species: "livestock",
     category: "nutrition",
@@ -194,6 +205,7 @@ export const blogArticles = [
   },
   {
     id: 12,
+    slug: "senior-dog-care-arthritis-joints",
     date: "2026-02-08",
     species: "dog",
     category: "health",
@@ -226,6 +238,7 @@ export const blogArticles = [
   },
   {
     id: 13,
+    slug: "increasing-milk-yield-nutrition",
     date: "2026-02-12",
     species: "livestock",
     category: "nutrition",
@@ -258,6 +271,7 @@ export const blogArticles = [
   },
   {
     id: 14,
+    slug: "cat-obesity-health-risks",
     date: "2026-02-15",
     species: "cat",
     category: "nutrition",
@@ -290,6 +304,7 @@ export const blogArticles = [
   },
   {
     id: 15,
+    slug: "ketosis-dairy-cows-symptoms",
     date: "2026-02-18",
     species: "livestock",
     category: "health",
@@ -322,6 +337,7 @@ export const blogArticles = [
   },
   {
     id: 16,
+    slug: "toxic-foods-for-dogs",
     date: "2026-02-22",
     species: "dog",
     category: "nutrition",
@@ -354,6 +370,7 @@ export const blogArticles = [
   },
   {
     id: 17,
+    slug: "worm-infestation-sheep-deworming",
     date: "2026-02-25",
     species: "livestock",
     category: "health",
@@ -386,6 +403,7 @@ export const blogArticles = [
   },
   {
     id: 18,
+    slug: "hairballs-in-cats-prevention",
     date: "2026-02-28",
     species: "cat",
     category: "health",
@@ -418,6 +436,7 @@ export const blogArticles = [
   },
   {
     id: 19,
+    slug: "biosecurity-poultry-farms",
     date: "2026-03-02",
     species: "livestock",
     category: "safety",
@@ -450,6 +469,7 @@ export const blogArticles = [
   },
   {
     id: 20,
+    slug: "ear-infections-otitis-in-dogs",
     date: "2026-03-05",
     species: "dog",
     category: "health",
@@ -482,6 +502,7 @@ export const blogArticles = [
   },
   {
     id: 21,
+    slug: "why-dogs-scratch-ears",
     date: "2026-03-10",
     species: "dog",
     category: "health",
@@ -514,6 +535,7 @@ export const blogArticles = [
   },
   {
     id: 22,
+    slug: "importance-of-salt-for-livestock",
     date: "2026-03-12",
     species: "livestock",
     category: "nutrition",
@@ -546,6 +568,7 @@ export const blogArticles = [
   },
   {
     id: 23,
+    slug: "why-cat-isnt-drinking-water",
     date: "2026-03-15",
     species: "cat",
     category: "health",
@@ -578,6 +601,7 @@ export const blogArticles = [
   },
   {
     id: 24,
+    slug: "sheep-shearing-health-benefits",
     date: "2026-03-18",
     species: "livestock",
     category: "prevention",
@@ -610,6 +634,7 @@ export const blogArticles = [
   },
   {
     id: 25,
+    slug: "can-dogs-eat-bones-safety",
     date: "2026-03-20",
     species: "dog",
     category: "nutrition",
@@ -642,6 +667,7 @@ export const blogArticles = [
   },
   {
     id: 26,
+    slug: "why-chickens-stop-laying-eggs",
     date: "2026-03-22",
     species: "livestock",
     category: "health",
@@ -674,6 +700,7 @@ export const blogArticles = [
   },
   {
     id: 27,
+    slug: "dog-dental-care-guide",
     date: "2026-03-25",
     species: "dog",
     category: "health",
@@ -706,6 +733,7 @@ export const blogArticles = [
   },
   {
     id: 28,
+    slug: "calf-nutrition-first-days",
     date: "2026-03-28",
     species: "livestock",
     category: "nutrition",
@@ -738,6 +766,7 @@ export const blogArticles = [
   },
   {
     id: 29,
+    slug: "why-cats-hate-bathing",
     date: "2026-03-30",
     species: "cat",
     category: "health",
@@ -770,6 +799,7 @@ export const blogArticles = [
   },
   {
     id: 30,
+    slug: "goat-care-and-health-tips",
     date: "2026-04-02",
     species: "livestock",
     category: "health",
@@ -802,6 +832,7 @@ export const blogArticles = [
   },
 {
     id: 31,
+    slug: "gumboro-disease-poultry-prevention",
     date: "2026-04-05",
     species: "livestock",
     category: "prevention",
@@ -834,6 +865,7 @@ export const blogArticles = [
   },
   {
     id: 32,
+    slug: "beekeeping-varroa-mite-control",
     date: "2026-04-10",
     species: "livestock",
     category: "health",
@@ -866,6 +898,7 @@ export const blogArticles = [
   },
   {
     id: 33,
+    slug: "rabbit-feeding-bloating-prevention",
     date: "2026-04-15",
     species: "livestock",
     category: "nutrition",
@@ -898,6 +931,7 @@ export const blogArticles = [
   },
   {
     id: 34,
+    slug: "horse-hoof-care-guide",
     date: "2026-04-20",
     species: "livestock",
     category: "health",
@@ -930,6 +964,7 @@ export const blogArticles = [
   },
   {
     id: 35,
+    slug: "piglet-iron-injection-care",
     date: "2026-04-25",
     species: "livestock",
     category: "health",
@@ -962,6 +997,7 @@ export const blogArticles = [
   },
   {
     id: 36,
+    slug: "puppy-socialization-importance",
     date: "2026-04-28",
     species: "dog",
     category: "health",
@@ -994,6 +1030,7 @@ export const blogArticles = [
   },
   {
     id: 37,
+    slug: "feline-urinary-stone-disease-diet",
     date: "2026-05-02",
     species: "cat",
     category: "health",
@@ -1026,6 +1063,7 @@ export const blogArticles = [
   },
   {
     id: 38,
+    slug: "pasture-rotation-livestock-health",
     date: "2026-05-05",
     species: "livestock",
     category: "prevention",
@@ -1058,6 +1096,7 @@ export const blogArticles = [
   },
   {
     id: 39,
+    slug: "fish-farming-pond-oxygen-levels",
     date: "2026-05-10",
     species: "livestock",
     category: "health",
@@ -1090,6 +1129,7 @@ export const blogArticles = [
   },
   {
     id: 40,
+    slug: "calving-assistance-farmer-tips",
     date: "2026-05-15",
     species: "livestock",
     category: "health",

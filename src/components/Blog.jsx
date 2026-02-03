@@ -84,7 +84,7 @@ const Blog = ({ lang, t, onArticleClick }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredArticles.map((article) => (
           <article 
-            key={article.id}
+            key={article.slug}
             onClick={() => onArticleClick(article)}
             className="group bg-white rounded-[2.5rem] border-2 border-slate-50 overflow-hidden hover:shadow-2xl hover:border-teal-100 transition-all duration-500 flex flex-col cursor-pointer"
           >
