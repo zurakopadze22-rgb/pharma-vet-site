@@ -30,6 +30,13 @@ const App = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // URL-ის განახლება view-ს მიხედვით
+    if (view === 'home') {
+      window.history.pushState(null, '', '/');
+    } else {
+      window.history.pushState(null, '', `/#${view}`);
+    }
   }, [view, selectedProduct, selectedArticle]);
 
   const openProduct = (product) => {
