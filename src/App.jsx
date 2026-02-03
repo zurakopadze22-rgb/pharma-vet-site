@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react'; // <-- დავამატეთ ანალიტიკა
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Shop from './components/Shop';
@@ -12,7 +13,7 @@ import BrandsSlider from './components/BrandsSlider';
 import PartnerDetail from './components/PartnerDetail';
 import BecomePartner from './components/BecomePartner';
 import Blog from './components/Blog';
-import BlogDetail from './components/BlogDetail'; // <-- აუცილებლად დაამატეთ ეს იმპორტი
+import BlogDetail from './components/BlogDetail';
 
 import { translations } from './translations';
 import { productsData } from './data/products';
@@ -38,7 +39,7 @@ const App = () => {
 
   const openArticle = (article) => {
     setSelectedArticle(article);
-    setView('blog-detail'); // გადავდივართ დეტალურ ხედზე
+    setView('blog-detail');
   };
 
   const handlePartnerClick = (partner) => {
@@ -103,6 +104,9 @@ const App = () => {
       </main>
 
       <Footer t={t.footer} />
+      
+      {/* Vercel Analytics - აღრიცხავს ვიზიტებს ყველა გვერდზე */}
+      <Analytics />
     </div>
   );
 };
