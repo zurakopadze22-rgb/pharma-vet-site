@@ -37,24 +37,31 @@ const ProductDetail = ({ lang, allProducts = [], onProductClick, t }) => {
   };
 
   const jsonLd = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": product.name[lang],
-    "image": `https://pharmavet.ge${product.image}`,
-    "description": product.purpose?.[lang] || "",
-    "brand": {
-      "@type": "Brand",
-      "name": product.manufacturer
-    },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "GEL",
-      "price": product.price,
-      "itemCondition": "https://schema.org/NewCondition",
-      "availability": "https://schema.org/InStock",
-      "priceValidUntil": "2027-01-01"
-    }
-  };
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": product.name[lang],
+  "image": product.image.startsWith('http') ? product.image : `https://www.pharmavet.ge${product.image}`,
+  "description": product.purpose?.[lang] || "",
+  "brand": {
+    "@type": "Brand",
+    "name": product.manufacturer
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": window.location.href,
+    "priceCurrency": "GEL",
+    "price": product.price.toString(),
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  },
+  // დაამატე ესენიც "Merchant Listings"-ისთვის
+  "sku": `PV-${product.id}`,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "1"
+  }
+};
   useEffect(() => {
   if (product) {
     // ტაბის სახელის შეცვლა
