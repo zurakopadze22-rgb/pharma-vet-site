@@ -26,6 +26,34 @@ const App = () => {
   const navigate = useNavigate();
 
   const t = translations[lang]; 
+  const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "PharmaVet",
+  "image": "https://pharmavet.ge/logo.png", // შენი ლოგოს ლინკი
+  "@id": "https://pharmavet.ge",
+  "url": "https://pharmavet.ge",
+  "telephone": "+995XXXXXXXXX", // შენი ნომერი
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ქუჩის სახელი და ნომერი",
+    "addressLocality": "Tbilisi",
+    "addressRegion": "Georgia",
+    "postalCode": "01XX",
+    "addressCountry": "GE"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 41.7151, // ზუსტი კოორდინატები Maps-იდან
+    "longitude": 44.8271
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "09:00",
+    "closes": "18:00"
+  }
+};
 
   // გვერდის გადასვლისას ავტომატურად ზემოთ ატანა
   useEffect(() => {

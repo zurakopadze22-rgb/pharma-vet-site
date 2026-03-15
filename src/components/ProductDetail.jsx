@@ -37,31 +37,35 @@ const ProductDetail = ({ lang, allProducts = [], onProductClick, t }) => {
   };
 
   const jsonLd = {
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": product.name[lang],
-  "image": product.image.startsWith('http') ? product.image : `https://www.pharmavet.ge${product.image}`,
-  "description": product.purpose?.[lang] || "",
-  "brand": {
-    "@type": "Brand",
-    "name": product.manufacturer
-  },
-  "offers": {
-    "@type": "Offer",
-    "url": window.location.href,
-    "priceCurrency": "GEL",
-    "price": product.price.toString(),
-    "availability": "https://schema.org/InStock",
-    "itemCondition": "https://schema.org/NewCondition"
-  },
-  // დაამატე ესენიც "Merchant Listings"-ისთვის
-  "sku": `PV-${product.id}`,
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5",
-    "reviewCount": "1"
-  }
-};
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name[lang],
+    // აქ ვამოწმებთ: თუ product.image უკვე შეიცავს http-ს, პირდაპირ მას ვიყენებთ.
+    // თუ არ შეიცავს (მაგალითად არის "/img/vet.jpg"), მაშინ ვამატებთ საიტის დომენს.
+    "image": product.image.startsWith('http') 
+      ? product.image 
+      : `https://pharmavet.ge${product.image}`,
+    "description": product.purpose?.[lang] || "",
+    "brand": {
+      "@type": "Brand",
+      "name": product.manufacturer
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "GEL",
+      "price": product.price.toString(),
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "priceValidUntil": "2027-01-01"
+    },
+    "sku": `PV-${product.id}`,
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "reviewCount": "1"
+    }
+  };
   useEffect(() => {
   if (product) {
     // ტაბის სახელის შეცვლა
