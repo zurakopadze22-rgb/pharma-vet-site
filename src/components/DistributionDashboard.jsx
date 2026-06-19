@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase'; 
 import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  onSnapshot, 
-  query, 
-  where 
+  collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, setDoc, getDoc 
 } from "firebase/firestore";
 
 const ACCESS_CODE = import.meta.env.VITE_ADMIN_PIN;
@@ -24,20 +17,31 @@ export default function DistributionDashboard() {
   const [orders, setOrders] = useState([]);
   const [history, setHistory] = useState([]);
   const [weeklyArchives, setWeeklyArchives] = useState([]);
+  const [suppliers, setSuppliers] = useState([]); 
+
+  // RS.ge ავტორიზაციის State-ები
+  const [rsUsername, setRsUsername] = useState('');
+  const [rsPassword, setRsPassword] = useState('');
+  const [savedRsUser, setSavedRsUser] = useState('არ არის მითითებული');
+  const [isUploadingRS, setIsUploadingRS] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
   // ჩამოსაშლელი ბლოკების State-ები
   const [expandedHistory, setExpandedHistory] = useState({});
   const [expandedArchiveWeek, setExpandedArchiveWeek] = useState(null);
   const [expandedArchiveOrder, setExpandedArchiveOrder] = useState(null);
 
-  // ფორმების State-ები
+  // 📦 პროდუქტის ახალი ველები
   const [newProdName, setNewProdName] = useState('');
   const [newProdPrice, setNewProdPrice] = useState('');
   const [newProdCategory, setNewProdCategory] = useState('');
   const [newProdVolume, setNewProdVolume] = useState('');
   const [newProdStock, setNewProdStock] = useState('');
-  const [newPartnerName, setNewPartnerName] = useState('');
+  const [newProdBarcode, setNewProdBarcode] = useState('');
+  const [newProdUnit, setNewProdUnit] = useState('1'); 
+  const [newProdVat, setNewProdVat] = useState('0'); 
 
+  // ✍️ პროდუქტის რედაქტირების ველები
   const [editingProductId, setEditingProductId] = useState(null);
   const [editProdName, setEditProdName] = useState('');
   const [editProdPrice, setEditProdPrice] = useState('');
@@ -45,11 +49,31 @@ export default function DistributionDashboard() {
   const [editProdVolume, setEditProdVolume] = useState('');
   const [editProdStock, setEditProdStock] = useState('');
   const [editProdDamaged, setEditProdDamaged] = useState('');
+  const [editProdBarcode, setEditProdBarcode] = useState('');
+  const [editProdUnit, setEditProdUnit] = useState('1');
+  const [editProdVat, setEditProdVat] = useState('0');
 
+  // 🤝 პარტნიორის ახალი ველები
+  const [newPartnerName, setNewPartnerName] = useState('');
+  const [newPartnerTin, setNewPartnerTin] = useState(''); 
+  const [newPartnerAddress, setNewPartnerAddress] = useState(''); 
+
+  // 🚚 მომწოდებლის ახალი ველები
+  const [newSupplierName, setNewSupplierName] = useState('');
+  const [newSupplierPhone, setNewSupplierPhone] = useState('');
+  const [selectedSupplierForStock, setSelectedSupplierForStock] = useState('');
+  const [qtyToReceive, setQtyToReceive] = useState('');
+  const [productToReceiveId, setProductToReceiveId] = useState('');
+
+  const [showAllPartners, setShowAllPartners] = useState(false);
+  const [showAllSuppliers, setShowAllSuppliers] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [adminSearchQuery, setAdminSearchQuery] = useState(''); // 🔍 საძიებო ველის state ადმინისთვის
   const [selectedCategory, setSelectedCategory] = useState('ყველა');
   const [selectedPartner, setSelectedPartner] = useState('');
   const [cart, setCart] = useState([]);
+  
+  
 
   // ================= 🔄 FIREBASE REALTIME SYNCHRONIZATION =================
   useEffect(() => {
@@ -63,6 +87,10 @@ export default function DistributionDashboard() {
       setPartners(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
+    const unsubSuppliers = onSnapshot(collection(db, "dist_suppliers"), (snapshot) => {
+      setSuppliers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
     const qOrders = query(collection(db, "dist_orders"), where("status", "==", "მიმდინარე"));
     const unsubOrders = onSnapshot(qOrders, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -74,11 +102,22 @@ export default function DistributionDashboard() {
     });
 
     const unsubArchives = onSnapshot(collection(db, "dist_weekly_archives"), (snapshot) => {
-      setWeeklyArchives(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).reverse());
+      setWeeklyArchives(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
+    const fetchRSCredentials = async () => {
+        const rsDoc = await getDoc(doc(db, "settings", "rs_auth"));
+        if (rsDoc.exists()) {
+            const data = rsDoc.data();
+            setRsUsername(data.su || '');
+            setRsPassword(data.sp || '');
+            if(data.su) setSavedRsUser(data.su);
+        }
+    };
+    fetchRSCredentials();
+
     return () => {
-      unsubProducts(); unsubPartners(); unsubOrders(); unsubHistory(); unsubArchives();
+      unsubProducts(); unsubPartners(); unsubSuppliers(); unsubOrders(); unsubHistory(); unsubArchives();
     };
   }, [isAuthenticated]);
 
@@ -91,34 +130,289 @@ export default function DistributionDashboard() {
   };
 
   const toggleHistoryDetail = (id) => setExpandedHistory(prev => ({ ...prev, [id]: !prev[id] }));
-  
-  const toggleArchiveWeek = (id) => {
-    setExpandedArchiveWeek(prev => prev === id ? null : id);
-    setExpandedArchiveOrder(null); // კვირის შეცვლისას ღია შეკვეთა დაიმალოს
-  };
-  
+  const toggleArchiveWeek = (id) => { setExpandedArchiveWeek(prev => prev === id ? null : id); setExpandedArchiveOrder(null); };
   const toggleArchiveOrder = (id) => setExpandedArchiveOrder(prev => prev === id ? null : id);
+
+  // ================= 🚀 RS.GE ინტეგრაცია =================
+  const saveRSCredentials = async (e) => {
+    if (e) e.preventDefault();
+    if (!rsUsername || !rsPassword) return alert("გთხოვთ შეავსოთ იუზერიც და პაროლიც!");
+
+    setIsCheckingAuth(true);
+    try {
+        const response = await fetch('http://92.5.10.98:3001/api/check-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ su: rsUsername, sp: rsPassword })
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.valid) {
+            await setDoc(doc(db, "settings", "rs_auth"), { su: rsUsername, sp: rsPassword });
+            setSavedRsUser(rsUsername);
+            alert("✅ ავტორიზაცია წარმატებულია! პარამეტრები შეინახა.");
+        } else {
+            alert("❌ RS.ge-მ უარყო ავტორიზაცია!\nმომხმარებლის სახელი ან პაროლი არასწორია.");
+        }
+    } catch (error) { 
+        alert("❌ სერვერთან კავშირის შეცდომა: " + error.message); 
+    } finally {
+        setIsCheckingAuth(false);
+    }
+  };
+
+  const uploadToRS = async (order) => {
+      if (!rsUsername || !rsPassword) return alert("გთხოვთ, შეავსოთ RS.ge-ს პარამეტრები 'ბაზის მართვის' გვერდზე.");
+      if (order.rsUploaded) return alert("ეს ზედნადები უკვე ატვირთულია RS-ზე!");
+
+      setIsUploadingRS(true);
+      try {
+          const SERVER_URL = 'http://92.5.10.98:3001/api/upload-waybill';
+          
+          const response = await fetch(SERVER_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ su: rsUsername, sp: rsPassword, order: order })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+              const rsData = result.rs_response.save_waybillResult;
+              let statusCode = null;
+              let isError = false;
+
+              if (typeof rsData === 'object' && rsData !== null && rsData.RESULT) {
+                  statusCode = parseInt(rsData.RESULT.STATUS);
+                  isError = statusCode < 0;
+              } else {
+                  statusCode = parseInt(rsData);
+                  isError = statusCode < 0;
+              }
+
+              if (isError) {
+                  alert(`❌ RS.ge-მ უარყო ზედნადები!\nშეცდომის კოდი: ${statusCode}`);
+                  return;
+              }
+              
+              await updateDoc(doc(db, "dist_orders", order.id), {
+                  rsUploaded: true,
+                  rsWaybillId: rsData
+              });
+
+              alert(`✅ ზედნადები აიტვირთა შავთეთრებში!\nუნიკალური ნომერი: ${rsData}`);
+          } else {
+              alert(`❌ სერვერის შეცდომა: ${result.error}`);
+          }
+      } catch (err) {
+          alert(`❌ ვერ დავუკავშირდი სერვერს: ${err.message}`);
+      } finally {
+          setIsUploadingRS(false);
+      }
+  };
+
+  // ================= 🖨️ პრინტი & ექსპორტი =================
+  const handlePrintOrder = (order) => {
+  const today = new Date();
+  const printDate = `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getFullYear()}`;
+
+  // 🌐 ვიღებთ შენი ლოკალური ფაილის სრულ, აბსოლუტურ მისამართს
+  const logoUrl = `${window.location.origin}/logo.png`; 
+
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>ინვოისი - ${order.partner}</title>
+        <style>
+          html, body { margin: 0; padding: 0; font-family: 'Helvetica', 'Arial', sans-serif; color: #0f172a; font-size: 11px; }
+          body { padding: 15px; box-sizing: border-box; }
+          
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px; margin-bottom: 15px; }
+          .title-block h1 { font-size: 18px; font-weight: 800; margin: 0; color: #1e293b; }
+          .title-block .doc-num { font-size: 10px; color: #64748b; margin-top: 3px; font-weight: bold; }
+          
+          .logo-block { text-align: right; }
+          .logo-img { height: 45px; object-fit: contain; }
+          
+          .requisites { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+          .req-box { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
+          .req-box h3 { margin: 0 0 4px 0; font-size: 11px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; text-transform: uppercase; }
+          .req-box p { margin: 2px 0; color: #475569; }
+          
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; page-break-inside: avoid; }
+          th { background-color: #f1f5f9; color: #334155; font-weight: 700; padding: 6px 8px; border: 1px solid #cbd5e1; text-transform: uppercase; font-size: 10px; }
+          td { padding: 6px 8px; border: 1px solid #e2e8f0; color: #334155; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .w-10 { width: 30px; }
+          
+          .total-block { display: flex; justify-content: flex-end; margin-top: 10px; page-break-inside: avoid; }
+          .total-table { width: 200px; font-size: 12px; }
+          .total-table td { padding: 4px; border: none; }
+          .total-row { font-size: 14px; font-weight: 900; color: #1e293b; border-top: 2px solid #cbd5e1 !important; }
+          
+          .signatures { display: grid; grid-template-cols: 1fr 1fr; gap: 40px; margin-top: 30px; page-break-inside: avoid; }
+          .sig-line { border-bottom: 1px solid #94a3b8; height: 30px; margin-bottom: 4px; }
+          .sig-box p { margin: 1px 0; color: #64748b; }
+          
+          @media print { 
+            html, body { height: 99%; overflow: hidden; }
+            body { padding: 10px; }
+            .req-box { background: transparent; }
+            @page { size: A4; margin: 0.5cm; } 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="title-block">
+            <h1>სასაქონლო ზედნადები / ინვოისი</h1>
+            <div class="doc-num">სისტემური №: ${order.id ? order.id.substring(0, 8).toUpperCase() : 'N/A'} | თარიღი: ${printDate}</div>
+          </div>
+          <div class="logo-block">
+            <img src="${logoUrl}" alt="PharmaVet Logo" class="logo-img" onload="window.print(); window.close();" onerror="window.print(); window.close();" />
+          </div>
+        </div>
+
+        <div class="requisites">
+          <div class="req-box">
+            <h3>გამგზავნი</h3>
+            <p><strong>დასახელება:</strong> შპს ფარმავეტი</p>
+            <p><strong>საიდენტ. კოდი:</strong> 430048110</p>
+            <p><strong>მისამართი:</strong> თბილისი, საქართველო</p>
+          </div>
+          <div class="req-box">
+            <h3>მიმღები</h3>
+            <p><strong>დასახელება:</strong> ${order.partner}</p>
+            <p><strong>საიდენტ. კოდი:</strong> ${order.partnerTin || 'N/A'}</p>
+            <p><strong>მისამართი:</strong> ${order.partnerAddress || 'N/A'}</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="w-10 text-center">№</th>
+              <th>პროდუქტის დასახელება</th>
+              <th class="text-center">განზომილება</th>
+              <th class="text-center">რაოდენობა</th>
+              <th class="text-right">ფასი</th>
+              <th class="text-right">თანხა</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.items.map((i, idx) => `
+              <tr>
+                <td class="text-center text-gray-500">${idx + 1}</td>
+                <td class="font-bold">${i.product.name}</td>
+                <td class="text-center">${i.product.volume || 'ცალი'}</td>
+                <td class="text-center font-mono">${i.quantity}ც</td>
+                <td class="text-right font-mono">${i.product.price.toFixed(2)} ₾</td>
+                <td class="text-right font-mono font-bold">${(i.product.price * i.quantity).toFixed(2)} ₾</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="total-block">
+          <table class="total-table">
+            <tr class="total-row">
+              <td>სულ გადასახდელი:</td>
+              <td class="text-right font-mono">${order.totalPrice.toFixed(2)} ₾</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="signatures">
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <p><strong>ჩააბარა (გამგზავნი):</strong></p>
+            <p>თარიღი: _______________</p>
+          </div>
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <p><strong>მიიღო (მიმღები):</strong></p>
+            <p>თარიღი: _______________</p>
+          </div>
+        </div>
+        
+        </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
+  const handleExportRS = (order) => {
+    const headers = ['დასახელება', 'ზომის ერთეული', 'რაოდენობა', 'ფასი', 'თანხა'];
+    const rows = order.items.map(i => [
+      `"${i.product.name}"`, 
+      `"${i.product.volume || 'ცალი'}"`, 
+      i.quantity, 
+      i.product.price, 
+      (i.product.price * i.quantity).toFixed(2)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `RS_${order.partner}_${order.createdAt.substring(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // ================= ⚙️ ADMIN FUNCTIONS =================
   const handleAddProduct = async () => {
-    if (!newProdName || !newProdPrice || !newProdCategory || !newProdVolume) return alert('შეავსეთ ძირითადი ველები!');
+    if (!newProdName || !newProdPrice || !newProdBarcode) return alert('შეავსეთ სახელი, ფასი და შტრიხკოდი!');
     try {
       await addDoc(collection(db, "dist_products"), {
-        name: newProdName, price: parseFloat(newProdPrice) || 0, category: newProdCategory, volume: newProdVolume, stock: parseInt(newProdStock) || 0, damaged: 0
+        name: newProdName, 
+        price: parseFloat(newProdPrice) || 0, 
+        category: newProdCategory, 
+        volume: newProdVolume, 
+        stock: parseInt(newProdStock) || 0, 
+        damaged: 0,
+        barcode: newProdBarcode,
+        unitId: parseInt(newProdUnit),
+        vatType: parseInt(newProdVat)
       });
       alert("✅ წამალი დაემატა!");
-      setNewProdName(''); setNewProdPrice(''); setNewProdCategory(''); setNewProdVolume(''); setNewProdStock('');
+      setNewProdName(''); setNewProdPrice(''); setNewProdCategory(''); setNewProdVolume(''); 
+      setNewProdStock(''); setNewProdBarcode(''); setNewProdUnit('1'); setNewProdVat('0');
     } catch (error) { alert("❌ შეცდომა: " + error.message); }
   };
 
   const startEditProduct = (product) => {
-    setEditingProductId(product.id); setEditProdName(product.name); setEditProdPrice(product.price); setEditProdCategory(product.category); setEditProdVolume(product.volume); setEditProdStock(product.stock); setEditProdDamaged(product.damaged);
+    setEditingProductId(product.id); 
+    setEditProdName(product.name); 
+    setEditProdPrice(product.price); 
+    setEditProdCategory(product.category || ''); 
+    setEditProdVolume(product.volume || ''); 
+    setEditProdStock(product.stock); 
+    setEditProdDamaged(product.damaged || 0);
+    setEditProdBarcode(product.barcode || '');
+    setEditProdUnit(product.unitId?.toString() || '1');
+    setEditProdVat(product.vatType?.toString() || '0');
   };
 
   const saveProductEdit = async (id) => {
     try {
-      await updateDoc(doc(db, "dist_products", id), { name: editProdName, price: parseFloat(editProdPrice) || 0, category: editProdCategory, volume: editProdVolume, stock: parseInt(editProdStock) || 0, damaged: parseInt(editProdDamaged) || 0 });
+      await updateDoc(doc(db, "dist_products", id), { 
+          name: editProdName, 
+          price: parseFloat(editProdPrice) || 0, 
+          category: editProdCategory, 
+          volume: editProdVolume, 
+          stock: parseInt(editProdStock) || 0, 
+          damaged: parseInt(editProdDamaged) || 0,
+          barcode: editProdBarcode,
+          unitId: parseInt(editProdUnit),
+          vatType: parseInt(editProdVat)
+      });
       setEditingProductId(null);
+      alert("✅ ცვლილებები წარმატებით შეინახა!");
     } catch(error) { alert("შეცდომა: " + error.message); }
   };
 
@@ -126,13 +420,52 @@ export default function DistributionDashboard() {
     try { await updateDoc(doc(db, "dist_products", productId), { [field]: parseInt(value) || 0 }); } catch(err) { console.error(err); }
   };
 
+  const handleWipeDamaged = async (product) => {
+    if (product.damaged <= 0) return alert("ამ პროდუქტს ბრაკი არ უფიქსირდება!");
+    if (window.confirm(`ნამდვილად გსურთ ${product.damaged}ც ბრაკის სამუდამოდ ჩამოწერა მარაგებიდან?`)) {
+      try {
+        await updateDoc(doc(db, "dist_products", product.id), { damaged: 0 });
+        alert("✅ ბრაკი წარმატებით ჩამოიწერა!");
+      } catch (err) { alert(err.message); }
+    }
+  };
+
+  const handleAddSupplier = async () => {
+    if (!newSupplierName) return alert("შეავსეთ მომწოდებლის სახელი!");
+    try {
+      await addDoc(collection(db, "dist_suppliers"), { name: newSupplierName, phone: newSupplierPhone || 'N/A' });
+      alert("✅ მომწოდებელი დაემატა!");
+      setNewSupplierName(''); setNewSupplierPhone('');
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleReceiveStock = async () => {
+    const qty = parseInt(qtyToReceive);
+    if (!productToReceiveId || isNaN(qty) || qty <= 0 || !selectedSupplierForStock) {
+      return alert("გთხოვთ აირჩიოთ წამალი, მომწოდებელი და მიუთითოთ სწორი რაოდენობა!");
+    }
+    try {
+      const prodRef = doc(db, "dist_products", productToReceiveId);
+      const currentProd = products.find(p => p.id === productToReceiveId);
+      if (currentProd) {
+        await updateDoc(prodRef, { stock: currentProd.stock + qty });
+        alert(`✅ საწყობში წარმატებით მიღებულია ${qty}ც ახალი მარაგი!`);
+        setQtyToReceive(''); setProductToReceiveId(''); setSelectedSupplierForStock('');
+      }
+    } catch (err) { alert(err.message); }
+  };
+
   const handleDeleteProduct = async (id) => {
     if (window.confirm('ნამდვილად წავშალოთ პროდუქტი?')) await deleteDoc(doc(db, "dist_products", id));
   };
 
   const handleAddPartner = async () => {
-    if (!newPartnerName) return alert('შეიყვანეთ სახელი!');
-    try { await addDoc(collection(db, "dist_partners"), { name: newPartnerName }); setNewPartnerName(''); } catch (error) { alert("❌ შეცდომა: " + error.message); }
+    if (!newPartnerName || !newPartnerTin || !newPartnerAddress) return alert('შეავსეთ პარტნიორის ყველა ველი!');
+    try { 
+        await addDoc(collection(db, "dist_partners"), { name: newPartnerName, tin: newPartnerTin, address: newPartnerAddress }); 
+        alert("✅ პარტნიორი დაემატა!");
+        setNewPartnerName(''); setNewPartnerTin(''); setNewPartnerAddress(''); 
+    } catch (error) { error.message; }
   };
 
   const handleDeletePartner = async (id) => {
@@ -153,18 +486,26 @@ export default function DistributionDashboard() {
 
   const submitOrder = async () => {
     if (!selectedPartner || cart.length === 0) return alert('აირჩიეთ პარტნიორი და პროდუქტები!');
+    const partnerObj = partners.find(p => p.name === selectedPartner);
+    if (!partnerObj) return alert('პარტნიორი ვერ მოიძებნა!');
+
     const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
     const now = new Date();
     const formattedDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} - ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     try {
       await addDoc(collection(db, "dist_orders"), {
-        partner: selectedPartner,
-        items: cart.map(item => ({ product: { id: item.product.id, name: item.product.name, price: item.product.price, volume: item.product.volume }, originalQuantity: item.quantity, quantity: item.quantity })),
-        totalPrice: orderTotal,
-        status: 'მიმდინარე',
-        createdAt: formattedDate,
-        changesLog: []
+        partner: partnerObj.name, 
+        partnerTin: partnerObj.tin,
+        partnerAddress: partnerObj.address,
+        items: cart.map(item => ({ 
+            product: { 
+                id: item.product.id, name: item.product.name, price: item.product.price, volume: item.product.volume,
+                barcode: item.product.barcode || '0000', unitId: item.product.unitId || 1, vatType: item.product.vatType || 0
+            }, 
+            originalQuantity: item.quantity, quantity: item.quantity 
+        })),
+        totalPrice: orderTotal, status: 'მიმდინარე', createdAt: formattedDate, changesLog: [], rsUploaded: false 
       });
       setCart([]); setSelectedPartner('');
       alert('შეკვეთა გაიგზავნა საწყობში!');
@@ -185,9 +526,7 @@ export default function DistributionDashboard() {
   const confirmOrder = async (orderId) => {
     const order = orders.find(o => o.id === orderId);
     if (!order) return;
-    
-    let wasEdited = false;
-    const logs = [];
+    let wasEdited = false; const logs = [];
 
     try {
       for (const item of order.items) {
@@ -203,14 +542,21 @@ export default function DistributionDashboard() {
       const completedTime = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} - ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
       
       await updateDoc(doc(db, "dist_orders", orderId), { 
-        items: order.items, 
-        totalPrice: order.totalPrice, 
-        status: wasEdited ? 'რედაქტირებული' : 'დასრულებული', 
-        changesLog: logs, 
-        completedAt: completedTime 
+        items: order.items, totalPrice: order.totalPrice, status: wasEdited ? 'რედაქტირებული' : 'დასრულებული', changesLog: logs, completedAt: completedTime 
       });
       alert('შეკვეთა ჩალაგდა!');
     } catch(err) { alert("შეცდომა ჩალაგებისას: " + err.message); }
+  };
+  // ❌ შეკვეთის გაუქმება/წაშლა
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm('ნამდვილად გსურთ ამ შეკვეთის გაუქმება და წაშლა?')) {
+      try {
+        await deleteDoc(doc(db, "dist_orders", orderId));
+        alert('შეკვეთა წარმატებით გაუქმდა!');
+      } catch (err) {
+        alert('შეცდომა გაუქმებისას: ' + err.message);
+      }
+    }
   };
 
   // ================= 🔒 კვირის დახურვა =================
@@ -224,10 +570,7 @@ export default function DistributionDashboard() {
         const today = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()}`;
         
         await addDoc(collection(db, "dist_weekly_archives"), { 
-          closedDate: today, 
-          ordersCount: history.length, 
-          totalSales: history.reduce((sum, o) => sum + o.totalPrice, 0),
-          archivedOrders: history 
+          closedDate: today, ordersCount: history.length, totalSales: history.reduce((sum, o) => sum + o.totalPrice, 0), archivedOrders: history 
         });
 
         for (const hOrder of history) await updateDoc(doc(db, "dist_orders", hOrder.id), { status: "დაარქივებული" });
@@ -242,7 +585,56 @@ export default function DistributionDashboard() {
     return totals;
   })();
 
-  const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) && (selectedCategory === 'ყველა' || p.category === selectedCategory));
+  // 🔄 სრულყოფილი ორმხრივი ტრანსლიტერაციის ფუნქცია
+  const transliterate = (text) => {
+    const textLower = text.toLowerCase();
+    const geoToEngMap = {
+      'ა':'a', 'ბ':'b', 'გ':'g', 'დ':'d', 'ე':'e', 'ვ':'v', 'ზ':'z', 'თ':'t', 'ი':'i', 'კ':'k', 
+      'ლ':'l', 'მ':'m', 'ნ':'n', 'ო':'o', 'პ':'p', 'ჟ':'zh', 'რ':'r', 'ს':'s', 'ტ':'t', 'უ':'u', 
+      'ფ':'f', 'ქ':'q', 'ღ':'gh', 'ყ':'q', 'შ':'sh', 'ც':'ts', 'ძ':'dz', 'წ':'ts', 'ჭ':'ch', 'ხ':'kh', 'ჯ':'j', 'ჰ':'h'
+    };
+    const engToGeoMap = {
+      'a':'ა', 'b':'ბ', 'g':'გ', 'დ':'d', 'e':'ე', 'v':'ვ', 'z':'ზ', 't':'თ', 'i':'ი', 'k':'კ',
+      'l':'ლ', 'm':'მ', 'n':'ნ', 'o':'ო', 'p':'პ', 'r':'რ', 's':'ს', 'u':'უ', 'f':'ფ', 'q':'ყ', 
+      'c':'ც', 'h':'ჰ', 'j':'ჯ', 'x':'ხ', 'w':'ვ', 'y':'ი'
+    };
+    let toEng = ""; for (let char of textLower) { toEng += geoToEngMap[char] !== undefined ? geoToEngMap[char] : char; }
+    let toGeo = ""; for (let char of textLower) { toGeo += engToGeoMap[char] !== undefined ? engToGeoMap[char] : char; }
+    let directEng = textLower.replace(/ც/g, 'c').replace(/ჰ/g, 'h').replace(/ხ/g, 'x').replace(/შ/g, 'sh').replace(/ჩ/g, 'ch');
+    return { toEng, toGeo, directEng };
+  };
+
+  // პრესელერის ფილტრი
+  const filteredProducts = products.filter(p => {
+    const nameLower = p.name.toLowerCase(); const queryLower = searchQuery.toLowerCase();
+    const { toEng, toGeo, directEng } = transliterate(queryLower);
+    const matchesSearch = nameLower.includes(queryLower) || nameLower.includes(toEng) || nameLower.includes(toGeo) || nameLower.includes(directEng);
+    return matchesSearch && (selectedCategory === 'ყველა' || p.category === selectedCategory);
+  });
+
+  // 🔍 ახალი ფილტრი ადმინის გვერდისთვის (საინიციაციო ძებნა)
+  const adminFilteredProducts = products.filter(p => {
+    const nameLower = p.name.toLowerCase(); const queryLower = adminSearchQuery.toLowerCase();
+    const { toEng, toGeo, directEng } = transliterate(queryLower);
+    return nameLower.includes(queryLower) || nameLower.includes(toEng) || nameLower.includes(toGeo) || nameLower.includes(directEng);
+  });
+
+  // ================= 📊 ანალიტიკის ლოგიკა (არქივისთვის) =================
+  const analytics = (() => {
+    let globalSales = 0; const prodSales = {}; const clientSales = {};
+    weeklyArchives.forEach(arch => {
+      globalSales += arch.totalSales || 0;
+      if (arch.archivedOrders) {
+        arch.archivedOrders.forEach(o => {
+          clientSales[o.partner] = (clientSales[o.partner] || 0) + (o.totalPrice || 0);
+          if (o.items) { o.items.forEach(i => { prodSales[i.product.name] = (prodSales[i.product.name] || 0) + (i.quantity || 0); }); }
+        });
+      }
+    });
+    const topProduct = Object.entries(prodSales).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+    const topClient = Object.entries(clientSales).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+    return { globalSales, topProduct, topClient };
+  })();
 
   if (!isAuthenticated) {
     return (
@@ -250,7 +642,9 @@ export default function DistributionDashboard() {
         <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-emerald-500">
           <h2 className="text-2xl font-black mb-2 text-center text-slate-800">შიდა სისტემა</h2>
           <input type="password" value={authCode} onChange={(e) => setAuthCode(e.target.value)} className="w-full p-3 border rounded-xl mb-4 text-center text-xl tracking-widest focus:ring-2 focus:ring-emerald-500 outline-none font-bold bg-slate-50" placeholder="****" />
-          <button type="submit" className="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 transition">შესვლა</button>
+          <button type="submit" disabled={isCheckingAuth} className={`w-full p-2.5 rounded-lg text-xs font-bold transition text-white ${isCheckingAuth ? 'bg-slate-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+            {isCheckingAuth ? '⏳ მოწმდება RS.ge-ზე...' : 'მონაცემების შენახვა ✓'}
+          </button>
         </form>
       </div>
     );
@@ -259,21 +653,20 @@ export default function DistributionDashboard() {
   return (
     <div className="p-6 bg-slate-50 min-h-screen font-sans text-slate-800 max-w-7xl mx-auto">
       
-      {/* ჰედერი */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">🧬 PharmaVet Cloud Distribution</h1>
-          <p className="text-emerald-600 text-xs mt-0.5 font-bold">🟢 Firebase ონლაინ რეჟიმი აქტიურია</p>
+          <h1 className="text-2xl font-black text-slate-900">🧬 PharmaVet Cloud</h1>
+          <p className="text-emerald-600 text-xs mt-0.5 font-bold">🟢 Firebase ონლაინ რეჟიმი</p>
         </div>
         <div className="flex bg-slate-100 p-1 rounded-xl gap-1 w-full sm:w-auto overflow-x-auto">
           <button onClick={() => setActiveTab('preseller')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'preseller' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🛒 პრესელერი</button>
           <button onClick={() => setActiveTab('warehouse')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'warehouse' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🏬 საწყობი ({orders.length})</button>
           <button onClick={() => setActiveTab('history')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'history' ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>📜 მიმდინარე კვირა</button>
+          <button onClick={() => setActiveTab('archive')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'archive' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🗄️ არქივი & ანალიტიკა</button>
           <button onClick={() => setActiveTab('admin')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>⚙️ ბაზის მართვა</button>
         </div>
       </div>
 
-      {/* ================= TAB 1: პრესელერი ================= */}
       {activeTab === 'preseller' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -284,27 +677,27 @@ export default function DistributionDashboard() {
                 {categories.map((c, i) => <option key={i} value={c}>{c}</option>)}
               </select>
             </div>
-            {products.length === 0 ? (
-              <p className="text-gray-400 text-xs italic text-center py-6 bg-slate-50 rounded-xl">ბაზა ცარიელია.</p>
-            ) : (
-              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                {filteredProducts.map(p => {
-                  const cartItem = cart.find(item => item.product.id === p.id);
-                  return (
-                    <div key={p.id} className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-slate-50/40">
-                      <div>
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+              {filteredProducts.map(p => {
+                const cartItem = cart.find(item => item.product.id === p.id);
+                const isLowStock = p.stock <= 10;
+                return (
+                  <div key={p.id} className="flex items-center justify-between p-3 border border-slate-100 rounded-xl bg-slate-50/40">
+                    <div>
+                      <div className="flex items-center gap-2">
                         <h4 className="font-bold text-sm text-slate-800">{p.name}</h4>
-                        <p className="text-[11px] text-gray-400">მოცულობა: {p.volume} | ხელმისაწვდომია: <span className="font-bold text-slate-600">{p.stock} ცალი</span></p>
+                        {isLowStock && <span className="animate-pulse bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-black">⚠️ კრიტიკული მარაგი!</span>}
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="font-extrabold text-sm text-slate-700">{p.price.toFixed(2)} ₾</span>
-                        <input type="number" min="0" placeholder="0" value={cartItem ? cartItem.quantity : ''} onChange={e => addToCart(p, e.target.value)} className="w-16 p-1.5 border rounded-lg text-center font-bold bg-white" />
-                      </div>
+                      <p className="text-[11px] text-gray-400">მოცულობა: {p.volume} | ხელმისაწვდომია: <span className={`font-bold ${isLowStock ? 'text-rose-600' : 'text-slate-600'}`}>{p.stock} ცალი</span></p>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    <div className="flex items-center gap-4">
+                      <span className="font-extrabold text-sm text-slate-700">{p.price.toFixed(2)} ₾</span>
+                      <input type="number" min="0" placeholder="0" value={cartItem ? cartItem.quantity : ''} onChange={e => addToCart(p, e.target.value)} className="w-16 p-1.5 border rounded-lg text-center font-bold bg-white" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-4">
             <h2 className="text-lg font-bold text-slate-900 mb-4">შეკვეთის გაფორმება</h2>
@@ -312,7 +705,7 @@ export default function DistributionDashboard() {
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">პარტნიორი ობიექტი</label>
               <select value={selectedPartner} onChange={e => setSelectedPartner(e.target.value)} className="w-full p-2.5 border rounded-xl bg-white text-sm font-semibold">
                 <option value="">-- აირჩიეთ პარტნიორი --</option>
-                {partners.map((p) => <option key={p.id} value={p.name}>{p.name}</option>)}
+                {partners.map((p) => <option key={p.id} value={p.name}>{p.name} (ს/ნ: {p.tin})</option>)}
               </select>
             </div>
             {cart.length > 0 ? (
@@ -338,8 +731,7 @@ export default function DistributionDashboard() {
         </div>
       )}
 
-      {/* ================= TAB 2: საწყობი ================= */}
-      {activeTab === 'warehouse' && (
+     {activeTab === 'warehouse' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-4">
             <h2 className="text-lg font-bold text-slate-900 mb-2">🏬 აქტიური შესასრულებელი შეკვეთები</h2>
@@ -353,7 +745,6 @@ export default function DistributionDashboard() {
                       <h3 className="font-black text-slate-800 text-base">{order.partner}</h3>
                       <p className="text-[10px] text-indigo-600 font-bold mt-0.5">📅 გაფორმდა: {order.createdAt}</p>
                     </div>
-                    <span className="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md font-bold uppercase">მზადდება</span>
                   </div>
 
                   <div className="overflow-x-auto mb-4 border rounded-xl">
@@ -389,7 +780,17 @@ export default function DistributionDashboard() {
                     <span className="text-slate-600">ღირებულება:</span>
                     <span className="text-blue-600 text-sm font-black">{order.totalPrice.toFixed(2)} ₾</span>
                   </div>
-                  <button type="button" onClick={() => confirmOrder(order.id)} className="w-full bg-blue-600 text-white py-2.5 rounded-xl hover:bg-blue-700 font-bold text-xs">ჩალაგების დადასტურება ✓</button>
+                  
+                  {/* 🆕 დამატებული ღილაკების ბლოკი */}
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => handleCancelOrder(order.id)} className="w-1/3 bg-rose-100 text-rose-700 py-2.5 rounded-xl hover:bg-rose-200 font-bold text-xs transition">
+                      ❌ გაუქმება
+                    </button>
+                    <button type="button" onClick={() => confirmOrder(order.id)} className="w-2/3 bg-blue-600 text-white py-2.5 rounded-xl hover:bg-blue-700 font-bold text-xs transition">
+                      ჩალაგების დადასტურება ✓
+                    </button>
+                  </div>
+
                 </div>
               ))
             )}
@@ -398,27 +799,32 @@ export default function DistributionDashboard() {
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
             <h2 className="text-base font-bold text-slate-900 mb-1">📦 საწყობის ინვენტარი</h2>
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 mt-4">
-              {products.map(p => (
-                <div key={p.id} className="p-3 border rounded-xl bg-slate-50/50 space-y-2">
-                  <div className="font-bold text-xs text-slate-800">{p.name}</div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
-                    <div>
-                      <label className="block text-gray-400 mb-0.5 font-medium">✅ მარაგი:</label>
-                      <input type="number" value={p.stock} onChange={e => handleQuickStockUpdate(p.id, 'stock', e.target.value)} className="w-full p-1 border rounded text-center font-bold text-slate-700" />
+              {products.map(p => {
+                const isLow = p.stock <= 10;
+                return (
+                  <div key={p.id} className={`p-3 border rounded-xl bg-slate-50/50 space-y-2 ${isLow ? 'border-l-4 border-l-rose-500 bg-rose-50/20' : ''}`}>
+                    <div className="font-bold text-xs text-slate-800 flex justify-between">
+                      <span>{p.name}</span>
+                      {isLow && <span className="text-[9px] text-rose-600 font-black">⚠️ მცირეა!</span>}
                     </div>
-                    <div>
-                      <label className="block text-rose-400 mb-0.5 font-medium">⚠️ ბრაკი:</label>
-                      <input type="number" value={p.damaged} onChange={e => handleQuickStockUpdate(p.id, 'damaged', e.target.value)} className="w-full p-1 border rounded text-center font-bold text-rose-700" />
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div>
+                        <label className="block text-gray-400 mb-0.5 font-medium">✅ მარაგი:</label>
+                        <input type="number" value={p.stock} onChange={e => handleQuickStockUpdate(p.id, 'stock', e.target.value)} className="w-full p-1 border rounded text-center font-bold text-slate-700" />
+                      </div>
+                      <div>
+                        <label className="block text-rose-400 mb-0.5 font-medium">⚠️ ბრაკი:</label>
+                        <input type="number" value={p.damaged || 0} onChange={e => handleQuickStockUpdate(p.id, 'damaged', e.target.value)} className="w-full p-1 border rounded text-center font-bold text-rose-700" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* ================= TAB 3: მიმდინარე კვირა ================= */}
       {activeTab === 'history' && (
         <div className="space-y-8 animate-fadeIn">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -467,12 +873,20 @@ export default function DistributionDashboard() {
 
                         {isExpanded && (
                           <div className="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                            <div className="flex flex-wrap justify-end gap-2 bg-slate-50 p-2 border-b">
+                              <button onClick={() => handlePrintOrder(h)} className="bg-slate-800 text-white px-3 py-1.5 rounded text-[10px] font-bold hover:bg-slate-700 transition">🖨️ ბეჭდვა</button>
+                              <button onClick={() => handleExportRS(h)} className="bg-emerald-600 text-white px-3 py-1.5 rounded text-[10px] font-bold hover:bg-emerald-700 transition">📥 CSV ექსპორტი</button>
+                              <button onClick={() => uploadToRS(h)} disabled={isUploadingRS || h.rsUploaded} className={`px-3 py-1.5 rounded text-[10px] font-bold transition flex items-center gap-1 ${h.rsUploaded ? 'bg-emerald-100 text-emerald-800 cursor-not-allowed border border-emerald-300' : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50'}`}>
+                                {isUploadingRS && !h.rsUploaded ? 'იტვირთება...' : h.rsUploaded ? `✅ RS ატვირთულია (${h.rsWaybillId || '✓'})` : '🚀 RS-ზე ატვირთვა'}
+                              </button>
+                            </div>
+
                             <table className="w-full text-left text-[11px] sm:text-xs">
                               <thead className="bg-slate-100 text-slate-600 font-bold border-b">
                                 <tr>
                                   <th className="p-2">პროდუქტი</th>
                                   <th className="p-2 text-center">მოთხოვნა</th>
-                                  <th className="p-2 text-center">ფაქტი</th>
+                                  <th className="p-2 text-center">მიწოდება</th>
                                   <th className="p-2 text-center">სხვაობა</th>
                                 </tr>
                               </thead>
@@ -481,7 +895,7 @@ export default function DistributionDashboard() {
                                   const diff = item.quantity - item.originalQuantity;
                                   const isFullMatch = diff === 0;
                                   return (
-                                    <tr key={i} className={isFullMatch ? 'bg-white' : 'bg-rose-50/60'}>
+                                    <tr key={i} className={isFullMatch ? 'bg-white' : 'bg-rose-50/70'}>
                                       <td className="p-2 font-bold text-slate-700">{item.product.name}</td>
                                       <td className="p-2 text-center text-slate-500">{item.originalQuantity}ც</td>
                                       <td className="p-2 text-center font-bold text-slate-700">{item.quantity}ც</td>
@@ -493,10 +907,6 @@ export default function DistributionDashboard() {
                                 })}
                               </tbody>
                             </table>
-                            <div className="flex justify-between items-center bg-slate-50 p-2 border-t text-slate-700 font-bold">
-                              <span>ჯამი:</span>
-                              <span className="text-indigo-600">{h.totalPrice.toFixed(2)} ₾</span>
-                            </div>
                           </div>
                         )}
                       </div>
@@ -505,34 +915,33 @@ export default function DistributionDashboard() {
                 </div>
               )}
             </div>
-
-            {/* არქივზე გადასასვლელი ბლოკი */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center items-center text-center">
-              <div className="text-4xl mb-4">🗄️</div>
-              <h2 className="text-lg font-black text-slate-900 mb-2">მუდმივი არქივი</h2>
-              <p className="text-xs text-gray-500 mb-6">აქ ინახება დახურული კვირების სრული ისტორია, ყველა შეკვეთა და დეტალური ანალიტიკა სამუდამოდ.</p>
-              <button 
-                onClick={() => setActiveTab('archive')} 
-                className="bg-slate-900 text-white w-full py-3 rounded-xl font-bold hover:bg-indigo-600 transition"
-              >
-                სრული არქივის გახსნა ➔
-              </button>
-            </div>
           </div>
         </div>
       )}
 
-      {/* ================= 🚀 ახალი TAB 5: მუდმივი არქივის ფანჯარა ================= */}
+      {/* ================= 📊 TAB 5: მუდმივი არქივი (დეტალებით) ================= */}
       {activeTab === 'archive' && (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 animate-fadeIn min-h-[600px]">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 animate-fadeIn min-h-[600px] space-y-8">
+          <div className="flex justify-between items-center border-b pb-4">
             <div>
-              <h2 className="text-xl font-black text-slate-900">🗄️ მუდმივი არქივი</h2>
-              <p className="text-xs text-gray-500 mt-1">დახურული კვირების დეტალური ისტორია</p>
+              <h2 className="text-xl font-black text-slate-900">🗄️ მუდმივი არქივი & ანალიტიკა</h2>
+              <p className="text-xs text-gray-500 mt-1">დახურული კვირების ისტორია და ფინანსური მონაცემები</p>
             </div>
-            <button onClick={() => setActiveTab('history')} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm transition">
-              ⬅ უკან დაბრუნება
-            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl">
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">საერთო ბრუნვა (ჯამური)</span>
+              <span className="text-2xl font-black text-emerald-950 block mt-2">{analytics.globalSales.toFixed(2)} ₾</span>
+            </div>
+            <div className="bg-blue-50 border border-blue-100 p-5 rounded-2xl">
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block">Top გაყიდვადი მედიკამენტი</span>
+              <span className="text-sm font-black text-blue-950 block mt-3 truncate">{analytics.topProduct}</span>
+            </div>
+            <div className="bg-purple-50 border border-purple-100 p-5 rounded-2xl">
+              <span className="text-xs font-bold text-purple-600 uppercase tracking-wider block">ყველაზე მსხვილი პარტნიორი</span>
+              <span className="text-sm font-black text-purple-950 block mt-3 truncate">{analytics.topClient}</span>
+            </div>
           </div>
 
           {weeklyArchives.length === 0 ? (
@@ -542,13 +951,8 @@ export default function DistributionDashboard() {
               {weeklyArchives.map(arch => {
                 const isWeekOpen = expandedArchiveWeek === arch.id;
                 return (
-                  <div key={arch.id} className="border border-slate-200 rounded-xl overflow-hidden">
-                    
-                    {/* კვირის ჰედერი (კლიკებადი) */}
-                    <div 
-                      onClick={() => toggleArchiveWeek(arch.id)}
-                      className={`flex justify-between items-center p-4 cursor-pointer transition ${isWeekOpen ? 'bg-indigo-50 border-b border-indigo-100' : 'bg-slate-50 hover:bg-slate-100'}`}
-                    >
+                  <div key={arch.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/20">
+                    <div onClick={() => toggleArchiveWeek(arch.id)} className={`flex justify-between items-center p-4 cursor-pointer transition ${isWeekOpen ? 'bg-indigo-50/60 border-b border-indigo-100' : 'bg-slate-50 hover:bg-slate-100'}`}>
                       <div>
                         <span className="font-black text-slate-800 text-sm">კვირის დახურვა: <span className="text-indigo-600 ml-1">{arch.closedDate}</span></span>
                         <div className="flex gap-4 text-[11px] text-gray-500 mt-1 font-medium">
@@ -556,74 +960,54 @@ export default function DistributionDashboard() {
                           <span>💰 ბრუნვა: {arch.totalSales.toFixed(2)} ₾</span>
                         </div>
                       </div>
-                      <span className="text-slate-400 bg-white border px-2 py-1 rounded-md text-[10px] font-bold">
-                        {isWeekOpen ? 'დამალვა ▲' : 'გახსნა ▼'}
-                      </span>
+                      <span className="text-slate-400 bg-white border px-2 py-1 rounded-md text-[10px] font-bold">{isWeekOpen ? 'დამალვა ▲' : 'დეტალები ▼'}</span>
                     </div>
 
-                    {/* შიდა შეკვეთები (თუ კვირა ღიაა) */}
+                    {/* 👁️ გააქტიურებული კვირის შეკვეთების სია */}
                     {isWeekOpen && (
-                      <div className="p-4 bg-white space-y-3">
-                        {!arch.archivedOrders || arch.archivedOrders.length === 0 ? (
-                          <p className="text-xs text-gray-400 italic">დეტალები არ მოიძებნა.</p>
-                        ) : (
-                          arch.archivedOrders.map(order => {
-                            const isOrderOpen = expandedArchiveOrder === order.id;
-                            return (
-                              <div key={order.id} className="border border-slate-100 rounded-lg bg-slate-50/50">
-                                
-                                {/* შეკვეთის ჰედერი */}
-                                <div 
-                                  onClick={() => toggleArchiveOrder(order.id)}
-                                  className="flex justify-between items-center p-3 cursor-pointer hover:bg-slate-100 transition"
-                                >
-                                  <div>
-                                    <span className="font-bold text-slate-700 text-xs">🏪 {order.partner}</span>
-                                    <p className="text-[10px] text-gray-400 mt-0.5">თარიღი: {order.createdAt}</p>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    <span className="font-black text-indigo-600 text-xs">{order.totalPrice.toFixed(2)} ₾</span>
-                                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${order.status === 'რედაქტირებული' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
-                                      {order.status}
-                                    </span>
-                                  </div>
+                      <div className="p-4 bg-white space-y-3 border-t">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">📥 ამ კვირაში შესრულებული შეკვეთები:</p>
+                        {arch.archivedOrders && arch.archivedOrders.map((order, oIdx) => {
+                          const isOrderOpen = expandedArchiveOrder === order.id;
+                          return (
+                            <div key={order.id || oIdx} className="border border-slate-100 rounded-xl overflow-hidden bg-slate-50/30">
+                              <div onClick={() => toggleArchiveOrder(order.id)} className="p-3 flex justify-between items-center cursor-pointer hover:bg-slate-50">
+                                <div>
+                                  <span className="font-bold text-xs text-slate-800">🏪 {order.partner}</span>
+                                  <span className="text-[10px] text-gray-400 ml-3">📅 {order.completedAt || order.createdAt}</span>
                                 </div>
-
-                                {/* შეკვეთის დეტალური ცხრილი */}
-                                {isOrderOpen && (
-                                  <div className="border-t border-slate-200">
-                                    <table className="w-full text-left text-[11px]">
-                                      <thead className="bg-slate-100 text-slate-500 font-bold border-b">
-                                        <tr>
-                                          <th className="p-2">პროდუქტი</th>
-                                          <th className="p-2 text-center">მოთხოვნა</th>
-                                          <th className="p-2 text-center">გაიგზავნა</th>
-                                          <th className="p-2 text-center">სხვაობა</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="divide-y bg-white">
-                                        {order.items.map((item, i) => {
-                                          const diff = item.quantity - item.originalQuantity;
-                                          const isFullMatch = diff === 0;
-                                          return (
-                                            <tr key={i} className={isFullMatch ? '' : 'bg-rose-50/40'}>
-                                              <td className="p-2 font-bold text-slate-700">{item.product.name}</td>
-                                              <td className="p-2 text-center text-slate-500">{item.originalQuantity}ც</td>
-                                              <td className="p-2 text-center font-bold text-slate-800">{item.quantity}ც</td>
-                                              <td className={`p-2 text-center font-black ${isFullMatch ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                {isFullMatch ? '✓' : `${diff}ც`}
-                                              </td>
-                                            </tr>
-                                          );
-                                        })}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                )}
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-mono font-black text-indigo-600">{order.totalPrice.toFixed(2)} ₾</span>
+                                  <span className="text-[10px] text-slate-400">{isOrderOpen ? '▲' : '▼'}</span>
+                                </div>
                               </div>
-                            );
-                          })
-                        )}
+
+                              {/* 💊 კონკრეტული შეკვეთის წამლების სია */}
+                              {isOrderOpen && (
+                                <div className="p-3 bg-white border-t">
+                                  <table className="w-full text-left text-[11px]">
+                                    <thead className="bg-slate-50 text-slate-500 font-bold border-b">
+                                      <tr>
+                                        <th className="p-2">მედიკამენტი</th>
+                                        <th className="p-2 text-center">რაოდენობა</th>
+                                        <th className="p-2 text-right">ფასი</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                      {order.items && order.items.map((item, iIdx) => (
+                                        <tr key={iIdx}>
+                                          <td className="p-2 font-medium text-slate-700">{item.product.name}</td>
+                                          <td className="p-2 text-center font-mono font-bold text-slate-600">{item.quantity}ც</td>
+                                          <td className="p-2 text-right font-mono text-slate-600">{(item.product.price).toFixed(2)} ₾</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -634,67 +1018,301 @@ export default function DistributionDashboard() {
         </div>
       )}
 
-      {/* ================= TAB 4: მართვის პანელი ================= */}
+      {/* ================= TAB 4: მართვის პანელი (განახლებული სერჩით) ================= */}
       {activeTab === 'admin' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 className="text-base font-bold text-slate-900 mb-4">💊 პროდუქციის ბაზის მართვა</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6 bg-slate-50 p-3 rounded-xl border">
-              <input type="text" placeholder="სახელი" value={newProdName} onChange={e => setNewProdName(e.target.value)} className="p-2 border rounded-lg text-xs bg-white outline-none" />
-              <input type="number" step="0.01" placeholder="ფასი" value={newProdPrice} onChange={e => setNewProdPrice(e.target.value)} className="p-2 border rounded-lg text-xs bg-white outline-none" />
-              <input type="text" placeholder="კატეგორია" value={newProdCategory} onChange={e => setNewProdCategory(e.target.value)} className="p-2 border rounded-lg text-xs bg-white outline-none" />
-              <input type="text" placeholder="მოცულობა" value={newProdVolume} onChange={e => setNewProdVolume(e.target.value)} className="p-2 border rounded-lg text-xs bg-white outline-none" />
-              <input type="number" placeholder="საწყისი მარაგი" value={newProdStock} onChange={e => setNewProdStock(e.target.value)} className="p-2 border rounded-lg text-xs bg-white outline-none" />
-              <button type="button" onClick={handleAddProduct} className="col-span-2 sm:col-span-5 bg-indigo-600 text-white p-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition">ახალი პროდუქტის დამატება +</button>
-            </div>
-
-            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-              {products.map(p => (
-                <div key={p.id} className="p-3 border rounded-xl bg-slate-50/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                  {editingProductId === p.id ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-6 gap-1 w-full">
-                      <input type="text" value={editProdName} onChange={e => setEditProdName(e.target.value)} className="p-1.5 border rounded text-xs" />
-                      <input type="number" step="0.01" value={editProdPrice} onChange={e => setEditProdPrice(e.target.value)} className="p-1.5 border rounded text-xs" />
-                      <input type="text" value={editProdCategory} onChange={e => setEditProdCategory(e.target.value)} className="p-1.5 border rounded text-xs" />
-                      <input type="text" value={editProdVolume} onChange={e => setEditProdVolume(e.target.value)} className="p-1.5 border rounded text-xs" />
-                      <input type="number" value={editProdStock} onChange={e => setEditProdStock(e.target.value)} className="p-1.5 border rounded text-xs" />
-                      <input type="number" value={editProdDamaged} onChange={e => setEditProdDamaged(e.target.value)} className="p-1.5 border rounded text-xs" />
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="font-bold text-sm text-slate-800">{p.name}</span>
-                      <span className="text-[10px] text-gray-400 block">მოცულობა: {p.volume} | მარაგი: <span className="text-slate-700 font-bold">{p.stock}ც</span> | დაზიანებული: <span className="text-rose-600 font-bold">{p.damaged}ც</span></span>
-                    </div>
-                  )}
-                  <div className="flex gap-1 w-full sm:w-auto justify-end">
-                    {editingProductId === p.id ? (
-                      <button type="button" onClick={() => saveProductEdit(p.id)} className="bg-emerald-600 text-white px-2.5 py-1 rounded-md text-[10px] font-bold">OK</button>
-                    ) : (
-                      <>
-                        <button type="button" onClick={() => startEditProduct(p)} className="bg-amber-500 text-white px-2.5 py-1 rounded-md text-[10px] font-bold">შეცვლა</button>
-                        <button type="button" onClick={() => handleDeleteProduct(p.id)} className="bg-rose-500 text-white px-2.5 py-1 rounded-md text-[10px] font-bold">წაშლა</button>
-                      </>
-                    )}
+          
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 mb-4">💊 პროდუქციის ბაზის მართვა</h2>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 bg-slate-50 p-4 rounded-xl border">
+                <div className="col-span-2 sm:col-span-4">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">ძირითადი ინფორმაცია (ახალი პროდუქტი)</p>
+                  <div className="flex gap-2">
+                    <input type="text" placeholder="პროდუქტის დასახელება" value={newProdName} onChange={e => setNewProdName(e.target.value)} className="w-full p-2 border rounded-lg text-xs outline-none" />
+                    <input type="text" placeholder="შტრიხკოდი / სარეგ. N" value={newProdBarcode} onChange={e => setNewProdBarcode(e.target.value)} className="w-full p-2 border rounded-lg text-xs outline-none border-blue-200" />
                   </div>
                 </div>
-              ))}
+                
+                <input type="number" step="0.01" placeholder="ფასი" value={newProdPrice} onChange={e => setNewProdPrice(e.target.value)} className="p-2 border rounded-lg text-xs outline-none" />
+                <input type="number" placeholder="საწყისი მარაგი" value={newProdStock} onChange={e => setNewProdStock(e.target.value)} className="p-2 border rounded-lg text-xs outline-none" />
+                <input type="text" placeholder="მოცულობა (მაგ: 1ლ)" value={newProdVolume} onChange={e => setNewProdVolume(e.target.value)} className="p-2 border rounded-lg text-xs outline-none" />
+                <input type="text" placeholder="კატეგორია" value={newProdCategory} onChange={e => setNewProdCategory(e.target.value)} className="p-2 border rounded-lg text-xs outline-none" />
+                
+                <select value={newProdUnit} onChange={e => setNewProdUnit(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white">
+                  <option value="1">ცალი (1)</option>
+                  <option value="2">კგ (2)</option>
+                  <option value="3">ლიტრი (3)</option>
+                </select>
+
+                <select value={newProdVat} onChange={e => setNewProdVat(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white">
+                  <option value="0">დღგ 18% (0)</option>
+                  <option value="1">ნულოვანი (1)</option>
+                  <option value="2">დაუბეგრავი (2)</option>
+                </select>
+
+                <button type="button" onClick={handleAddProduct} className="col-span-2 sm:col-span-4 bg-indigo-600 text-white p-2.5 rounded-lg text-xs font-bold hover:bg-indigo-700 mt-2">ახალი პროდუქტის დამატება +</button>
+              </div>
+
+              {/* 🔍 ახალი ორენოვანი საძიებო ველი ადმინის გვერდისთვის */}
+              <div className="mb-4 bg-slate-100 p-2 rounded-xl">
+                <input 
+                  type="text" 
+                  placeholder="🔍 მოძებნე მედიკამენტი ბაზაში დასარედაქტირებლად..." 
+                  value={adminSearchQuery} 
+                  onChange={e => setAdminSearchQuery(e.target.value)} 
+                  className="w-full p-2 border rounded-lg bg-white text-xs outline-none font-medium" 
+                />
+              </div>
+
+              {/* 📋 პროდუქტების სია დინამიური რედაქტირების ფორმით */}
+
+              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+
+                {products.map(p => (
+
+                  <div key={p.id} className="p-4 border rounded-xl bg-slate-50/30 shadow-sm border-slate-100 transition-all">
+
+                    {editingProductId === p.id ? (
+
+                      /* ✍️ აქ იხსნება სრული რედაქტირების ფორმა */
+
+                      <div className="space-y-3 bg-white p-3 rounded-xl border border-amber-200">
+
+                        <p className="text-[10px] font-bold text-amber-600 uppercase">პროდუქტის რედაქტირება</p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                          <input type="text" value={editProdName} onChange={e => setEditProdName(e.target.value)} className="p-2 border rounded-lg text-xs font-bold bg-slate-50" placeholder="სახელი" />
+
+                          <input type="text" value={editProdBarcode} onChange={e => setEditProdBarcode(e.target.value)} className="p-2 border rounded-lg text-xs font-mono" placeholder="შტრიხკოდი" />
+
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+
+                          <div>
+
+                            <label className="text-[9px] text-gray-400 block font-bold">ფასი</label>
+
+                            <input type="number" step="0.01" value={editProdPrice} onChange={e => setEditProdPrice(e.target.value)} className="w-full p-2 border rounded-lg text-xs text-center font-bold" />
+
+                          </div>
+
+                          <div>
+
+                            <label className="text-[9px] text-gray-400 block font-bold">მარაგი</label>
+
+                            <input type="number" value={editProdStock} onChange={e => setEditProdStock(e.target.value)} className="w-full p-2 border rounded-lg text-xs text-center font-bold" />
+
+                          </div>
+
+                          <div>
+
+                            <label className="text-[9px] text-gray-400 block font-bold">ბრაკი</label>
+
+                            <input type="number" value={editProdDamaged} onChange={e => setEditProdDamaged(e.target.value)} className="w-full p-2 border rounded-lg text-xs text-center font-bold text-rose-600" />
+
+                          </div>
+
+                          <div>
+
+                            <label className="text-[9px] text-gray-400 block font-bold">მოცულობა</label>
+
+                            <input type="text" value={editProdVolume} onChange={e => setEditProdVolume(e.target.value)} className="w-full p-2 border rounded-lg text-xs text-center" />
+
+                          </div>
+
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+
+                          <input type="text" value={editProdCategory} onChange={e => setEditProdCategory(e.target.value)} className="p-2 border rounded-lg text-xs" placeholder="კატეგორია" />
+
+                          
+
+                          <select value={editProdUnit} onChange={e => setEditProdUnit(e.target.value)} className="p-2 border rounded-lg text-xs bg-white">
+
+                            <option value="1">ცალი (1)</option>
+
+                            <option value="2">კგ (2)</option>
+
+                            <option value="3">ლიტრი (3)</option>
+
+                          </select>
+
+
+
+                          <select value={editProdVat} onChange={e => setEditProdVat(e.target.value)} className="p-2 border rounded-lg text-xs bg-white">
+
+                            <option value="0">დღგ 18% (0)</option>
+
+                            <option value="1">ნულოვანი (1)</option>
+
+                            <option value="2">დაუბეგრავი (2)</option>
+
+                          </select>
+
+                        </div>
+
+                        <div className="flex gap-2 justify-end pt-2 border-t">
+
+                          <button type="button" onClick={() => setEditingProductId(null)} className="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold">გაუქმება</button>
+
+                          <button type="button" onClick={() => saveProductEdit(p.id)} className="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm">შენახვა ✓</button>
+
+                        </div>
+
+                      </div>
+
+                    ) : (
+
+                      /* 👁️ ჩვეულებრივი ჩვენების რეჟიმი */
+
+                      <div className="flex justify-between items-center">
+
+                        <div>
+
+                          <span className="font-bold text-sm text-slate-800">{p.name}</span>
+
+                          <span className="text-[10px] text-gray-500 block mt-0.5">
+
+                            შტრიხკოდი: <span className="font-mono text-slate-700 font-bold">{p.barcode || 'N/A'}</span> | 
+
+                            მოცულობა: <span className="font-bold">{p.volume || 'N/A'}</span> | 
+
+                            მარაგი: <span className="text-emerald-600 font-bold">{p.stock}ც</span> | 
+
+                            ბრაკი: <span className="text-rose-600 font-bold">{p.damaged || 0}ც</span>
+
+                          </span>
+
+                          <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded mt-1 inline-block font-medium">
+
+                            დღგ: {p.vatType === 2 ? 'დაუბეგრავი' : p.vatType === 1 ? 'ნულოვანი' : '18%'} | ერთეული კოდი: {p.unitId || 1}
+
+                          </span>
+
+                        </div>
+
+                        <div className="flex gap-2">
+
+                            <button type="button" onClick={() => startEditProduct(p)} className="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-md text-[10px] font-bold transition">შეცვლა</button>
+
+                            <button type="button" onClick={() => handleDeleteProduct(p.id)} className="bg-rose-500 hover:bg-rose-600 text-white px-2.5 py-1.5 rounded-md text-[10px] font-bold transition">წაშლა</button>
+
+                        </div>
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                ))}
+
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 className="text-base font-bold text-slate-900 mb-4">🤝 პარტნიორების ბაზა</h2>
-            <div className="flex gap-1 mb-6 bg-slate-50 p-2 rounded-xl">
-              <input type="text" placeholder="ობიექტის სახელი" value={newPartnerName} onChange={e => setNewPartnerName(e.target.value)} className="flex-1 p-2 border rounded-lg text-xs bg-white outline-none" />
-              <button type="button" onClick={handleAddPartner} className="bg-purple-600 text-white px-3 py-2 rounded-lg text-xs font-bold">დამატება</button>
+          <div className="space-y-8">
+            
+            {/* 1. 🔐 RS.ge-ს ავტორიზაციის პანელი (ახლა უკვე სულ ზემოთ არის) */}
+            <form onSubmit={(e) => { e.preventDefault(); saveRSCredentials(); }} className="bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-800 text-white">
+              <div className="flex justify-between items-start mb-4">
+                  <div>
+                      <h2 className="text-base font-bold flex items-center gap-2"><span>🛡️</span> RS.ge ავტორიზაცია</h2>
+                      <p className="text-[10px] text-emerald-400 mt-1">მიმდინარე იუზერი: <span className="font-bold">{savedRsUser}</span></p>
+                  </div>
+              </div>
+              <div className="space-y-3">
+                <input 
+                    type="text" 
+                    placeholder="მომხმარებელი (მაგ: tbilisi)" 
+                    value={rsUsername} 
+                    onChange={e => setRsUsername(e.target.value)} 
+                    autoComplete="username"
+                    className="w-full p-2.5 border border-slate-700 rounded-lg text-xs bg-slate-800 text-white outline-none focus:border-blue-500" 
+                />
+                <input 
+                    type="password" 
+                    placeholder="პაროლი (მაგ: 123456)" 
+                    value={rsPassword} 
+                    onChange={e => setRsPassword(e.target.value)} 
+                    autoComplete="current-password"
+                    className="w-full p-2.5 border border-slate-700 rounded-lg text-xs bg-slate-800 text-white outline-none focus:border-blue-500" 
+                />
+                <button 
+                    type="submit" 
+                    className="w-full bg-blue-600 text-white p-2.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition"
+                >
+                    მონაცემების შენახვა ✓
+                </button>
+              </div>
+            </form>
+
+            {/* 2. 🤝 პარტნიორების ბაზა (ლიმიტით და "ყველას ნახვა" ფუნქციით) */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 mb-4">🤝 პარტნიორების ბაზა</h2>
+              <div className="flex flex-col gap-2 mb-4 bg-slate-50 p-3 rounded-xl border">
+                <input type="text" placeholder="ობიექტის სახელი" value={newPartnerName} onChange={e => setNewPartnerName(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white" />
+                <input type="text" placeholder="საიდენტიფიკაციო კოდი" value={newPartnerTin} onChange={e => setNewPartnerTin(e.target.value)} className="p-2 border rounded-lg text-xs outline-none border-blue-200 bg-white" />
+                <input type="text" placeholder="მიწოდების მისამართი" value={newPartnerAddress} onChange={e => setNewPartnerAddress(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white" />
+                <button type="button" onClick={handleAddPartner} className="bg-purple-600 text-white px-3 py-2 rounded-lg text-xs font-bold mt-1">დამატება</button>
+              </div>
+              
+              <div className="space-y-2">
+                {partners.slice(0, showAllPartners ? partners.length : 3).map(partner => (
+                  <div key={partner.id} className="p-2.5 border rounded-xl bg-slate-50/30 flex justify-between items-center text-xs">
+                    <div>
+                        <span className="font-bold text-slate-700 block">{partner.name}</span>
+                        <span className="text-[10px] text-gray-400">ს/ნ: {partner.tin}</span>
+                    </div>
+                    <button type="button" onClick={() => handleDeletePartner(partner.id)} className="bg-rose-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">X</button>
+                  </div>
+                ))}
+              </div>
+              
+              {partners.length > 3 && (
+                <button 
+                  type="button" 
+                  onClick={() => setShowAllPartners(!showAllPartners)} 
+                  className="w-full mt-3 text-center text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 p-2 rounded-xl transition"
+                >
+                  {showAllPartners ? '▲ დამალვა' : `▼ ყველა პარტნიორის ნახვა (${partners.length})`}
+                </button>
+              )}
             </div>
-            <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {partners.map(partner => (
-                <div key={partner.id} className="p-2.5 border rounded-xl bg-slate-50/30 flex justify-between items-center">
-                  <span className="font-bold text-xs text-slate-700">{partner.name}</span>
-                  <button type="button" onClick={() => handleDeletePartner(partner.id)} className="bg-rose-500 text-white px-2 py-1 rounded-md text-[9px] font-bold">X</button>
-                </div>
-              ))}
+
+            {/* 3. 🚚 მომწოდებლების კატალოგი (ლიმიტით და "ყველას ნახვა" ფუნქციით) */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 mb-4">🚚 მომწოდებლების კატალოგი</h2>
+              <div className="flex gap-1 mb-4 bg-slate-50 p-2 rounded-xl border">
+                <input type="text" placeholder="მომწოდებლის სახელი" value={newSupplierName} onChange={e => setNewSupplierName(e.target.value)} className="flex-1 p-2 border rounded-lg text-xs outline-none bg-white" />
+                <button type="button" onClick={handleAddSupplier} className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">დამატება</button>
+              </div>
+              
+              <div className="space-y-2">
+                {suppliers.slice(0, showAllSuppliers ? suppliers.length : 3).map(s => (
+                  <div key={s.id} className="p-2.5 bg-slate-50/30 border rounded-xl flex justify-between items-center text-xs font-medium text-slate-700">
+                    <span>🏢 {s.name}</span>
+                    {/* აქაც შეგიძლია მომავალში წაშლის ღილაკი ჩაამატო თუ დაგჭირდება */}
+                  </div>
+                ))}
+              </div>
+
+              {suppliers.length > 3 && (
+                <button 
+                  type="button" 
+                  onClick={() => setShowAllSuppliers(!showAllSuppliers)} 
+                  className="w-full mt-3 text-center text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 p-2 rounded-xl transition"
+                >
+                  {showAllSuppliers ? '▲ დამალვა' : `▼ ყველა მომწოდებლის ნახვა (${suppliers.length})`}
+                </button>
+              )}
             </div>
+
           </div>
         </div>
       )}
