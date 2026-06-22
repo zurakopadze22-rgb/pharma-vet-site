@@ -200,8 +200,13 @@ export default function DistributionDashboard() {
                   waybillData: {
                       BUYER_TIN: order.partnerTin,
                       BUYER_NAME: order.partner,
-                      START_ADDRESS: order.partnerAddress || "თბილისი",
+                      START_ADDRESS: "თბილისი",
                       END_ADDRESS: order.partnerAddress || "თბილისი",
+                      TRAN_TYPE: 1,                    // 1 = საავტომობილო
+                      DRIVER_TIN: "01010101010",        // სატესტო მძღოლის პ/ნ
+                      DRIVER_NAME: "გიორგი გიორგაძე",    // სატესტო სახელი
+                      CAR_NUMBER: "AA111AA",           // სატესტო ნომერი
+                      TRANS_COST_PAYER: 1,             // 1 = გამყიდველი იხდის ხარჯს
                       GOODS: formattedGoods
                   }
               })
