@@ -181,38 +181,57 @@ export default function DistributionDashboard() {
       try {
           const SERVER_URL = 'https://api.pharmavet.ge/api/upload-waybill';
           
+          // ვამზადებთ პროდუქტებს ზუსტად იმ ფორმატში, რასაც ბექენდი ელოდება
+          const formattedGoods = order.items.map(item => ({
+              W_NAME: item.product.name,
+              BAR_CODE: item.product.barcode || "",
+              UNIT_ID: parseInt(item.product.unitId) || 1,
+              QUANTITY: parseInt(item.quantity),
+              PRICE: parseFloat(item.product.price),
+              VAT_TYPE: parseInt(item.product.vatType) || 0
+          }));
+
           const response = await fetch(SERVER_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ su: rsUsername, sp: rsPassword, order: order })
+              body: JSON.stringify({ 
+                  su: rsUsername, 
+                  sp: rsPassword, 
+                  waybillData: {
+                      BUYER_TIN: order.partnerTin,
+                      BUYER_NAME: order.partner,
+                      START_ADDRESS: order.partnerAddress || "თბილისი",
+                      END_ADDRESS: order.partnerAddress || "თბილისი",
+                      GOODS: formattedGoods
+                  }
+              })
           });
 
           const result = await response.json();
 
           if (result.success) {
-              const rsData = result.rs_response.save_waybillResult;
-              let statusCode = null;
-              let isError = false;
-
-              if (typeof rsData === 'object' && rsData !== null && rsData.RESULT) {
-                  statusCode = parseInt(rsData.RESULT.STATUS);
-                  isError = statusCode < 0;
-              } else {
-                  statusCode = parseInt(rsData);
-                  isError = statusCode < 0;
+              // 🔄 სწორად ვიღებთ პასუხს ახალი ბექენდის სტრუქტურიდან
+              const rsData = result.data?.save_waybillResult || result.data;
+              
+              if (!rsData || !rsData.RESULT) {
+                  alert("❌ RS.ge-დან არასწორი სტრუქტურის პასუხი მოვიდა!");
+                  return;
               }
 
-              if (isError) {
+              const statusCode = parseInt(rsData.RESULT.STATUS);
+
+              if (statusCode < 0) {
                   alert(`❌ RS.ge-მ უარყო ზედნადები!\nშეცდომის კოდი: ${statusCode}`);
                   return;
               }
               
+              // თუ კოდი დადებითია, ესე იგი წარმატებით შეინახა!
               await updateDoc(doc(db, "dist_orders", order.id), {
                   rsUploaded: true,
-                  rsWaybillId: rsData
+                  rsWaybillId: String(statusCode) // ზედნადების ID ჩაჯდება ბაზაში
               });
 
-              alert(`✅ ზედნადები აიტვირთა შავთეთრებში!\nუნიკალური ნომერი: ${rsData}`);
+              alert(`✅ ზედნადები წარმატებით აიტვირთა შავთეთრებში!\nკოდი: ${statusCode}`);
           } else {
               alert(`❌ სერვერის შეცდომა: ${result.error}`);
           }
