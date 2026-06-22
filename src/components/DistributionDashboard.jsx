@@ -203,9 +203,9 @@ export default function DistributionDashboard() {
                       START_ADDRESS: "თბილისი",
                       END_ADDRESS: order.partnerAddress || "თბილისი",
                       TRAN_TYPE: 1,                    // 1 = საავტომობილო
-                      DRIVER_TIN: "01010101010",        // სატესტო მძღოლის პ/ნ
-                      DRIVER_NAME: "გიორგი გიორგაძე",    // სატესტო სახელი
-                      CAR_NUMBER: "AA111AA",           // სატესტო ნომერი
+                      DRIVER_TIN: "01027081073",        // სატესტო მძღოლის პ/ნ
+                      DRIVER_NAME: "ზურაბი კოპაძე",    // სატესტო სახელი
+                      CAR_NUMBER: "zu017ko",           // სატესტო ნომერი
                       TRANS_COST_PAYER: 1,             // 1 = გამყიდველი იხდის ხარჯს
                       GOODS: formattedGoods
                   }
