@@ -133,14 +133,25 @@ export default function DistributionDashboard() {
   const toggleArchiveWeek = (id) => { setExpandedArchiveWeek(prev => prev === id ? null : id); setExpandedArchiveOrder(null); };
   const toggleArchiveOrder = (id) => setExpandedArchiveOrder(prev => prev === id ? null : id);
 
-  // ================= 🚀 RS.GE ინტეგრაცია =================
   const saveRSCredentials = async (e) => {
     if (e) e.preventDefault();
     if (!rsUsername || !rsPassword) return alert("გთხოვთ შეავსოთ იუზერიც და პაროლიც!");
 
+    // 🚀 დროებითი დაშვება: თუ სატესტო იუზერია, ვაგდებთ შემოწმებას და ეგრევე ვინახავთ
+    if (rsUsername.toLowerCase() === 'tbilisi') {
+        try {
+            await setDoc(doc(db, "settings", "rs_auth"), { su: rsUsername, sp: rsPassword });
+            setSavedRsUser(rsUsername);
+            alert("✅ სატესტო იუზერი 'tbilisi' შეინახა შემოწმების გარეშე!");
+            return;
+        } catch (error) {
+            return alert("❌ Firebase-ში შენახვის შეცდომა: " + error.message);
+        }
+    }
+
     setIsCheckingAuth(true);
     try {
-        const response = await fetch('http://92.5.10.98:3001/api/check-auth', {
+        const response = await fetch('hhttps://api.pharmavet.ge/api/check-auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ su: rsUsername, sp: rsPassword })
@@ -168,7 +179,7 @@ export default function DistributionDashboard() {
 
       setIsUploadingRS(true);
       try {
-          const SERVER_URL = 'http://92.5.10.98:3001/api/upload-waybill';
+          const SERVER_URL = 'hhttps://api.pharmavet.ge/api/upload-waybill';
           
           const response = await fetch(SERVER_URL, {
               method: 'POST',
