@@ -151,7 +151,7 @@ export default function DistributionDashboard() {
 
     setIsCheckingAuth(true);
     try {
-        const response = await fetch('hhttps://api.pharmavet.ge/api/check-auth', {
+        const response = await fetch('https://api.pharmavet.ge/api/check-auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ su: rsUsername, sp: rsPassword })
@@ -179,7 +179,7 @@ export default function DistributionDashboard() {
 
       setIsUploadingRS(true);
       try {
-          const SERVER_URL = 'hhttps://api.pharmavet.ge/api/upload-waybill';
+          const SERVER_URL = 'https://api.pharmavet.ge/api/upload-waybill';
           
           const response = await fetch(SERVER_URL, {
               method: 'POST',
