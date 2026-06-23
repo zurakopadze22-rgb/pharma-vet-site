@@ -26,10 +26,17 @@ export default function DistributionDashboard() {
   const [isUploadingRS, setIsUploadingRS] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
-  // 🚚 სატრანსპორტო მონაცემების ახალი State-ები (დინამიური RS-ისთვის)
-  const [rsCarNumber, setRsCarNumber] = useState('');
-  const [rsDriverTin, setRsDriverTin] = useState('');
-  const [rsDriverName, setRsDriverName] = useState('');
+ // 🚚 სატრანსპორტო მონაცემების ახალი State-ები (ინახავს ლოკალურად ბრაუზერში)
+  const [rsCarNumber, setRsCarNumber] = useState(localStorage.getItem('rsCarNumber') || '');
+  const [rsDriverTin, setRsDriverTin] = useState(localStorage.getItem('rsDriverTin') || '');
+  const [rsDriverName, setRsDriverName] = useState(localStorage.getItem('rsDriverName') || '');
+
+  // 💾 ყოველ შეცვლაზე ავტომატურად ინახავს მძღოლის მონაცემებს
+  useEffect(() => {
+    localStorage.setItem('rsCarNumber', rsCarNumber);
+    localStorage.setItem('rsDriverTin', rsDriverTin);
+    localStorage.setItem('rsDriverName', rsDriverName);
+  }, [rsCarNumber, rsDriverTin, rsDriverName]);
 
   // ჩამოსაშლელი ბლოკების State-ები
   const [expandedHistory, setExpandedHistory] = useState({});
@@ -223,14 +230,8 @@ body: JSON.stringify({
           const result = await response.json();
 
           if (result.success) {
-              const rsData = result.data?.save_waybillResult || result.data;
-              
-              if (!rsData || !rsData.RESULT) {
-                  alert("❌ RS.ge-დან არასწორი სტრუქტურის პასუხი მოვიდა!");
-                  return;
-              }
-
-              const statusCode = parseInt(rsData.RESULT.STATUS);
+              const statusCode = parseInt(result.status);
+              const waybillId = result.id;
 
               if (statusCode < 0) {
                   alert(`❌ RS.ge-მ უარყო ზედნადები!\nშეცდომის კოდი: ${statusCode}`);
@@ -239,10 +240,10 @@ body: JSON.stringify({
               
               await updateDoc(doc(db, "dist_orders", order.id), {
                   rsUploaded: true,
-                  rsWaybillId: String(statusCode)
+                  rsWaybillId: String(waybillId)
               });
 
-              alert(`✅ ზედნადები წარმატებით აიტვირთა ლაივზე!\nზედნადების ID: ${statusCode}`);
+              alert(`✅ ზედნადები წარმატებით აიტვირთა ლაივზე!\nზედნადების ID: ${waybillId}`);
           } else {
               alert(`❌ სერვერის შეცდომა: ${result.error}`);
           }
