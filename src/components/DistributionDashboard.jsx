@@ -52,6 +52,7 @@ export default function DistributionDashboard() {
   const [newProdBarcode, setNewProdBarcode] = useState('');
   const [newProdUnit, setNewProdUnit] = useState('1'); 
   const [newProdVat, setNewProdVat] = useState('0'); 
+  const [newProdIsMed, setNewProdIsMed] = useState(false);
 
   // ✍️ პროდუქტის რედაქტირების ველები
   const [editingProductId, setEditingProductId] = useState(null);
@@ -64,6 +65,7 @@ export default function DistributionDashboard() {
   const [editProdBarcode, setEditProdBarcode] = useState('');
   const [editProdUnit, setEditProdUnit] = useState('1');
   const [editProdVat, setEditProdVat] = useState('0');
+  const [editProdIsMed, setEditProdIsMed] = useState(false);
 
   // 🤝 პარტნიორის ახალი ველები
   const [newPartnerName, setNewPartnerName] = useState('');
@@ -207,24 +209,27 @@ export default function DistributionDashboard() {
               VAT_TYPE: parseInt(item.product.vatType) || 0
           }));
 
+          // 🌟 ამოწმებს, თუ კალათაში ერთი პროდუქტი მაინც არის მედიკამენტი
+          const isMedicineOrder = order.items.some(item => item.product.isMed === true);
+
           const response = await fetch(SERVER_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              // 🌟 იპოვე body-ს ეს ნაწილი და შეცვალე ზუსტად ასე:
-body: JSON.stringify({ 
-    su: rsUsername, 
-    sp: rsPassword, 
-    waybillData: {
-        BUYER_TIN: order.partnerTin,
-        BUYER_NAME: order.partner,
-        START_ADDRESS: "თბილისი",
-        END_ADDRESS: order.partnerAddress || "თბილისი",
-        CAR_NUMBER: rsCarNumber.trim().toUpperCase(), 
-        DRIVER_TIN: rsDriverTin.trim(),         
-        DRIVER_NAME: rsDriverName.trim(),       
-        GOODS: formattedGoods
-    }
-})
+              body: JSON.stringify({ 
+                  su: rsUsername, 
+                  sp: rsPassword, 
+                  waybillData: {
+                      BUYER_TIN: order.partnerTin,
+                      BUYER_NAME: order.partner,
+                      START_ADDRESS: "თბილისი",
+                      END_ADDRESS: order.partnerAddress || "თბილისი",
+                      CAR_NUMBER: rsCarNumber.trim().toUpperCase(), 
+                      DRIVER_TIN: rsDriverTin.trim(),         
+                      DRIVER_NAME: rsDriverName.trim(),       
+                      IS_MED: isMedicineOrder ? 1 : 0, // 👈 გადაეცემა ბექენდს
+                      GOODS: formattedGoods
+                  }
+              })
           });
 
           const result = await response.json();
@@ -419,11 +424,13 @@ body: JSON.stringify({
         damaged: 0,
         barcode: newProdBarcode,
         unitId: parseInt(newProdUnit),
-        vatType: parseInt(newProdVat)
+        vatType: parseInt(newProdVat),
+        isMed: newProdIsMed
       });
       alert("✅ წამალი დაემატა!");
       setNewProdName(''); setNewProdPrice(''); setNewProdCategory(''); setNewProdVolume(''); 
       setNewProdStock(''); setNewProdBarcode(''); setNewProdUnit('1'); setNewProdVat('0');
+      setNewProdIsMed(false);
     } catch (error) { alert("❌ შეცდომა: " + error.message); }
   };
 
@@ -438,6 +445,7 @@ body: JSON.stringify({
     setEditProdBarcode(product.barcode || '');
     setEditProdUnit(product.unitId?.toString() || '1');
     setEditProdVat(product.vatType?.toString() || '0');
+    setEditProdIsMed(product.isMed || false);
   };
 
   const saveProductEdit = async (id) => {
@@ -451,7 +459,8 @@ body: JSON.stringify({
           damaged: parseInt(editProdDamaged) || 0,
           barcode: editProdBarcode,
           unitId: parseInt(editProdUnit),
-          vatType: parseInt(editProdVat)
+          vatType: parseInt(editProdVat),
+          isMed: editProdIsMed
       });
       setEditingProductId(null);
       alert("✅ ცვლილებები წარმატებით შეინახა!");
@@ -1111,6 +1120,11 @@ body: JSON.stringify({
                   <option value="1">ნულოვანი (1)</option>
                   <option value="2">დაუბეგრავი (2)</option>
                 </select>
+                {/* 👈 ახალი Checkbox */}
+                <label className="flex items-center justify-center gap-2 p-2 border rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold cursor-pointer">
+                  <input type="checkbox" checked={newProdIsMed} onChange={e => setNewProdIsMed(e.target.checked)} className="w-4 h-4 cursor-pointer" />
+                  💊 არის მედიკამენტი?
+                </label>
 
                 <button type="button" onClick={handleAddProduct} className="col-span-2 sm:col-span-4 bg-indigo-600 text-white p-2.5 rounded-lg text-xs font-bold hover:bg-indigo-700 mt-2">ახალი პროდუქტის დამატება +</button>
               </div>
@@ -1213,6 +1227,11 @@ body: JSON.stringify({
                             <option value="2">დაუბეგრავი (2)</option>
 
                           </select>
+                          {/* 👈 ახალი Checkbox */}
+                          <label className="flex items-center gap-2 p-2 border rounded-lg bg-amber-50 text-amber-700 text-xs font-bold cursor-pointer">
+                            <input type="checkbox" checked={editProdIsMed} onChange={e => setEditProdIsMed(e.target.checked)} className="w-4 h-4 cursor-pointer" />
+                            💊 მედიკამენტია
+                          </label>
 
                         </div>
 
