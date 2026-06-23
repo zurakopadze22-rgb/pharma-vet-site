@@ -26,6 +26,11 @@ export default function DistributionDashboard() {
   const [isUploadingRS, setIsUploadingRS] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
+  // 🚚 სატრანსპორტო მონაცემების ახალი State-ები (დინამიური RS-ისთვის)
+  const [rsCarNumber, setRsCarNumber] = useState('');
+  const [rsDriverTin, setRsDriverTin] = useState('');
+  const [rsDriverName, setRsDriverName] = useState('');
+
   // ჩამოსაშლელი ბლოკების State-ები
   const [expandedHistory, setExpandedHistory] = useState({});
   const [expandedArchiveWeek, setExpandedArchiveWeek] = useState(null);
@@ -176,12 +181,16 @@ export default function DistributionDashboard() {
   const uploadToRS = async (order) => {
       if (!rsUsername || !rsPassword) return alert("გთხოვთ, შეავსოთ RS.ge-ს პარამეტრები 'ბაზის მართვის' გვერდზე.");
       if (order.rsUploaded) return alert("ეს ზედნადები უკვე ატვირთულია RS-ზე!");
+      
+      // ვალიდაცია: ვამოწმებთ შევსებულია თუ არა ველები საიტზე
+      if (!rsCarNumber || !rsDriverTin || !rsDriverName) {
+          return alert("გთხოვთ, შეავსოთ სატრანსპორტო მონაცემები (მანქანის ნომერი, მძღოლი) რეესტრის ბლოკში გაგზავნამდე!");
+      }
 
       setIsUploadingRS(true);
       try {
           const SERVER_URL = 'https://api.pharmavet.ge/api/upload-waybill';
           
-          // ვამზადებთ პროდუქტებს ზუსტად იმ ფორმატში, რასაც ბექენდი ელოდება
           const formattedGoods = order.items.map(item => ({
               W_NAME: item.product.name,
               BAR_CODE: item.product.barcode || "",
@@ -194,28 +203,26 @@ export default function DistributionDashboard() {
           const response = await fetch(SERVER_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                  su: rsUsername, 
-                  sp: rsPassword, 
-                  waybillData: {
-                      BUYER_TIN: order.partnerTin,
-                      BUYER_NAME: order.partner,
-                      START_ADDRESS: "თბილისი",
-                      END_ADDRESS: order.partnerAddress || "თბილისი",
-                      TRAN_TYPE: 1,                    // 1 = საავტომობილო
-                      DRIVER_TIN: "01027081073",        // სატესტო მძღოლის პ/ნ
-                      DRIVER_NAME: "ზურაბი კოპაძე",    // სატესტო სახელი
-                      CAR_NUMBER: "zu017ko",           // სატესტო ნომერი
-                      TRANS_COST_PAYER: 1,             // 1 = გამყიდველი იხდის ხარჯს
-                      GOODS: formattedGoods
-                  }
-              })
+              // 🌟 იპოვე body-ს ეს ნაწილი და შეცვალე ზუსტად ასე:
+body: JSON.stringify({ 
+    su: rsUsername, 
+    sp: rsPassword, 
+    waybillData: {
+        BUYER_TIN: order.partnerTin,
+        BUYER_NAME: order.partner,
+        START_ADDRESS: "თბილისი",
+        END_ADDRESS: order.partnerAddress || "თბილისი",
+        CAR_NUMBER: rsCarNumber.trim().toUpperCase(), 
+        DRIVER_TIN: rsDriverTin.trim(),         
+        DRIVER_NAME: rsDriverName.trim(),       
+        GOODS: formattedGoods
+    }
+})
           });
 
           const result = await response.json();
 
           if (result.success) {
-              // 🔄 სწორად ვიღებთ პასუხს ახალი ბექენდის სტრუქტურიდან
               const rsData = result.data?.save_waybillResult || result.data;
               
               if (!rsData || !rsData.RESULT) {
@@ -230,13 +237,12 @@ export default function DistributionDashboard() {
                   return;
               }
               
-              // თუ კოდი დადებითია, ესე იგი წარმატებით შეინახა!
               await updateDoc(doc(db, "dist_orders", order.id), {
                   rsUploaded: true,
-                  rsWaybillId: String(statusCode) // ზედნადების ID ჩაჯდება ბაზაში
+                  rsWaybillId: String(statusCode)
               });
 
-              alert(`✅ ზედნადები წარმატებით აიტვირთა შავთეთრებში!\nკოდი: ${statusCode}`);
+              alert(`✅ ზედნადები წარმატებით აიტვირთა ლაივზე!\nზედნადების ID: ${statusCode}`);
           } else {
               alert(`❌ სერვერის შეცდომა: ${result.error}`);
           }
@@ -885,6 +891,24 @@ export default function DistributionDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
               <h2 className="text-base font-bold text-slate-900 mb-4">📜 მიმდინარე კვირის რეესტრი</h2>
+              {/* 🚚 სატრანპორტო მონაცემების პანელი */}
+              <div className="mb-6 bg-slate-900 text-white p-4 rounded-xl border border-slate-800 shadow-inner grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-3 pb-1 border-b border-slate-800">
+                  <h3 className="text-xs font-bold text-indigo-400 flex items-center gap-1">局 აქ ჩაწერე ნამდვილი სატრანსპორტო მონაცემები გაგზავნამდე:</h3>
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1">🚗 მანქანის სახელმწიფო ნომერი</label>
+                  <input type="text" placeholder="მაგ: LL111LL" value={rsCarNumber} onChange={e => setRsCarNumber(e.target.value)} className="w-full p-2 bg-slate-800 text-white text-xs rounded-lg border border-slate-700 outline-none focus:border-indigo-500 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1">👤 მძღოლის პირადი ნომერი</label>
+                  <input type="text" placeholder="11 ნიშნა კოდი" value={rsDriverTin} onChange={e => setRsDriverTin(e.target.value)} className="w-full p-2 bg-slate-800 text-white text-xs rounded-lg border border-slate-700 outline-none focus:border-indigo-500 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1">✍️ მძღოლის სახელი, გვარი</label>
+                  <input type="text" placeholder="მაგ: გიორგი გიორგაძე" value={rsDriverName} onChange={e => setRsDriverName(e.target.value)} className="w-full p-2 bg-slate-800 text-white text-xs rounded-lg border border-slate-700 outline-none focus:border-indigo-500" />
+                </div>
+              </div>
               {history.length === 0 ? (
                 <p className="text-gray-400 italic text-sm text-center py-8">შეკვეთები ჯერ არ დასრულებულა.</p>
               ) : (
