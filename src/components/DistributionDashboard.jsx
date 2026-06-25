@@ -496,27 +496,45 @@ export default function DistributionDashboard() {
   };
 
   // ================= ⚙️ ADMIN FUNCTIONS =================
+  // ================= ⚙️ განახლებული პროდუქტის დამატება =================
   const handleAddProduct = async () => {
-    if (!newProdName || !newProdPrice || !newProdBarcode) return alert('შეავსეთ სახელი, ფასი და შტრიხკოდი!');
+    // 🌟 1. ვალიდაციაში ვამოწმებთ ახალ ველებს (საცალო და საბითუმო ფასებს)
+    if (!newProdName || !newProdRetailPrice || !newProdWholesalePrice || !newProdBarcode) {
+      return alert('გთხოვთ შეავსოთ პროდუქტის სახელი, საცალო ფასი, საბითუმო ფასი და შტრიხკოდი!');
+    }
+    
     try {
       await addDoc(collection(db, "dist_products"), {
         name: newProdName, 
-        retailPrice: parseFloat(newProdRetailPrice) || 0, // 👈 საცალო
-        wholesalePrice: parseFloat(newProdWholesalePrice) || 0, // 👈 საბითუმო 
-        category: newProdCategory, 
-        volume: newProdVolume, 
+        retailPrice: parseFloat(newProdRetailPrice) || 0,
+        wholesalePrice: parseFloat(newProdWholesalePrice) || 0,
+        category: newProdCategory || 'სხვა', 
+        volume: newProdVolume || 'ცალი', 
         stock: parseInt(newProdStock) || 0, 
         damaged: 0,
         barcode: newProdBarcode,
-        unitId: parseInt(newProdUnit),
-        vatType: parseInt(newProdVat),
+        unitId: parseInt(newProdUnit) || 1,
+        vatType: parseInt(newProdVat) || 0,
         isMed: newProdIsMed
       });
-      alert("✅ წამალი დაემატა!");
-      setNewProdName(''); setNewProdPrice(''); setNewProdCategory(''); setNewProdVolume(''); 
-      setNewProdStock(''); setNewProdBarcode(''); setNewProdUnit('1'); setNewProdVat('0');
+      
+      alert("✅ წამალი წარმატებით დაემატა!");
+      
+      // 🌟 2. ვასუფთავებთ სწორ ცვლადებს, რომ ფორმა დაცარიელდეს
+      setNewProdName(''); 
+      setNewProdRetailPrice(''); 
+      setNewProdWholesalePrice(''); 
+      setNewProdCategory(''); 
+      setNewProdVolume(''); 
+      setNewProdStock(''); 
+      setNewProdBarcode(''); 
+      setNewProdUnit('1'); 
+      setNewProdVat('0');
       setNewProdIsMed(false);
-    } catch (error) { alert("❌ შეცდომა: " + error.message); }
+      
+    } catch (error) { 
+      alert("❌ შეცდომა: " + error.message); 
+    }
   };
 
   const startEditProduct = (product) => {
