@@ -890,13 +890,14 @@ export default function DistributionDashboard() {
                   {cart.map((item, i) => (
                     <div key={i} className="flex justify-between text-emerald-950">
                       <span>{item.product.name} x {item.quantity}</span>
-                      <span className="font-semibold">{(item.product.price * item.quantity).toFixed(2)} ₾</span>
+{/* 🟢 item.product.price შეიცვალა item.product.currentPrice-ით ან item.product.price-ით თუ ისედაც currentPrice მივანიჭეთ */}
+<span className="font-semibold">{((item.product.currentPrice || item.product.price || 0) * item.quantity).toFixed(2)} ₾</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex justify-between font-black text-emerald-900 text-sm border-t pt-2">
                   <span>ჯამური თანხა:</span>
-                  <span>{cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0).toFixed(2)} ₾</span>
+                  <span>{cart.reduce((sum, item) => sum + ((item.product.currentPrice || item.product.price || 0) * item.quantity), 0).toFixed(2)} ₾</span>
                 </div>
               </div>
             ) : (
