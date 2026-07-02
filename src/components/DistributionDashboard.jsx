@@ -742,6 +742,26 @@ export default function DistributionDashboard() {
     [...orders, ...history].forEach(o => o.items.forEach(i => totals[i.product.name] = (totals[i.product.name] || 0) + i.quantity));
     return totals;
   })();
+  // 💰 1. მიმდინარე კვირის ჯამური შემოსავლის გამოთვლა (რეალური მიწოდებით)
+  const totalWeeklyRevenue = history.reduce((sum, order) => {
+    const orderTotal = order.items.reduce((itemSum, item) => {
+      const price = item.product.price || 0;
+      return itemSum + (item.quantity * price);
+    }, 0);
+    return sum + orderTotal;
+  }, 0);
+
+  // 🗑️ 2. რეესტრიდან (Firebase-დან) შეკვეთის სამუდამოდ წაშლის ფუნქცია
+  const handleDeleteHistoryItem = async (id) => {
+    if (window.confirm("ნამდვილად გსურთ ამ შეკვეთის სამუდამოდ წაშლა რეესტრიდან?")) {
+      try {
+        await deleteDoc(doc(db, "dist_orders", id));
+        alert("✅ შეკვეთა წარმატებით წაიშალა ბაზიდან!");
+      } catch (err) {
+        alert("❌ წაშლის შეცდომა: " + err.message);
+      }
+    }
+  };
 
   // 🔄 სრულყოფილი ორმხრივი ტრანსლიტერაციის ფუნქცია
   const transliterate = (text) => {
@@ -1019,8 +1039,15 @@ export default function DistributionDashboard() {
               </button>
             </div>
 
+            {/* 📊 მიმდინარე კვირის ჯამური მოთხოვნა და თანხა */}
             <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <h2 className="text-base font-bold text-slate-900 mb-1">📊 მიმდინარე კვირის ჯამური მოთხოვნა</h2>
+              <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
+                <h2 className="text-base font-bold text-slate-900">📊 მიმდინარე კვირის ჯამური მოთხოვნა</h2>
+                <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm">
+                  <span>💰 ჯამური გაყიდვები:</span>
+                  <span className="text-sm text-emerald-600">{totalWeeklyRevenue.toLocaleString('ka-GE')} GEL</span>
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1 mt-4">
                 {Object.entries(totalQuantities).map(([name, qty], idx) => (
                   <div key={idx} className="flex justify-between p-2.5 border rounded-xl bg-slate-50 text-xs items-center">
@@ -1071,6 +1098,18 @@ export default function DistributionDashboard() {
                               {h.status}
                             </span>
                             <span className="text-slate-400 font-bold bg-white border px-2 py-1 rounded-md">{isExpanded ? '▲' : '▼'}</span>
+                            {/* 🗑️ წაშლის ახალი ღილაკი */}
+                            <button 
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation(); // აჩერებს ჩამოშლას
+                                handleDeleteHistoryItem(h.id);
+                              }}
+                              className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100"
+                              title="შეკვეთის წაშლა"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
 
