@@ -18,6 +18,7 @@ import BecomePartner from './components/BecomePartner';
 import Blog from './components/Blog';
 import BlogDetail from './components/BlogDetail';
 
+
 // მონაცემები
 import { translations } from './translations';
 import { productsData } from './data/products';

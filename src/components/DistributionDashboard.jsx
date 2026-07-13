@@ -4,10 +4,12 @@ import {
   collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, setDoc, getDoc 
 } from "firebase/firestore";
 
-const ACCESS_CODE = import.meta.env.VITE_ADMIN_PIN;
+const ADMIN_CODE = import.meta.env.VITE_ADMIN_PIN;
+const PRESELLER_CODE = import.meta.env.VITE_PRESELLER_PIN;
 
 export default function DistributionDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState('');
   const [authCode, setAuthCode] = useState('');
   const [activeTab, setActiveTab] = useState('preseller'); 
 
@@ -77,6 +79,13 @@ export default function DistributionDashboard() {
   const [newPartnerAddress, setNewPartnerAddress] = useState(''); 
   const [newPartnerType, setNewPartnerType] = useState('საცალო');
 
+  // ✏️ პარტნიორის რედაქტირების ველები (დაამატე ესენი)
+  const [editingPartnerId, setEditingPartnerId] = useState(null);
+  const [editPartnerName, setEditPartnerName] = useState('');
+  const [editPartnerTin, setEditPartnerTin] = useState('');
+  const [editPartnerAddress, setEditPartnerAddress] = useState('');
+  const [editPartnerType, setEditPartnerType] = useState('საცალო');
+
   // 🚚 მომწოდებლის ახალი ველები
   const [newSupplierName, setNewSupplierName] = useState('');
   const [newSupplierPhone, setNewSupplierPhone] = useState('');
@@ -90,6 +99,9 @@ export default function DistributionDashboard() {
   const [adminSearchQuery, setAdminSearchQuery] = useState(''); // 🔍 საძიებო ველის state ადმინისთვის
   const [selectedCategory, setSelectedCategory] = useState('ყველა');
   const [selectedPartner, setSelectedPartner] = useState('');
+  const [partnerSearchQuery, setPartnerSearchQuery] = useState(''); // პრესელერის ტაბის ძებნა
+  const [isPartnerDropdownOpen, setIsPartnerDropdownOpen] = useState(false);
+  const [partnerListSearchQuery, setPartnerListSearchQuery] = useState(''); // პარტნიორების ტაბის ძებნა
   const [cart, setCart] = useState([]);
   
   
@@ -144,8 +156,15 @@ export default function DistributionDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (authCode === ACCESS_CODE) setIsAuthenticated(true);
-    else alert('არასწორი კოდი!');
+    if (authCode === ADMIN_CODE) {
+      setUserRole('admin');
+      setIsAuthenticated(true);
+    } else if (authCode === PRESELLER_CODE) {
+      setUserRole('preseller');
+      setIsAuthenticated(true);
+    } else {
+      alert('არასწორი კოდი!');
+    }
   };
 
   const toggleHistoryDetail = (id) => setExpandedHistory(prev => ({ ...prev, [id]: !prev[id] }));
@@ -624,6 +643,28 @@ export default function DistributionDashboard() {
     } catch (error) { error.message; }
   };
 
+  // ✏️ პარტნიორის რედაქტირების ფუნქციები (დაამატე ეს ბლოკი)
+  const startEditPartner = (partner) => {
+    setEditingPartnerId(partner.id);
+    setEditPartnerName(partner.name);
+    setEditPartnerTin(partner.tin || '');
+    setEditPartnerAddress(partner.address || '');
+    setEditPartnerType(partner.type || 'საცალო');
+  };
+
+  const savePartnerEdit = async (id) => {
+    try {
+      await updateDoc(doc(db, "dist_partners", id), {
+        name: editPartnerName,
+        tin: editPartnerTin,
+        address: editPartnerAddress,
+        type: editPartnerType
+      });
+      setEditingPartnerId(null);
+      alert("✅ პარტნიორი წარმატებით განახლდა!");
+    } catch (error) { alert("შეცდომა: " + error.message); }
+  };
+
   const handleDeletePartner = async (id) => {
     if (window.confirm('წავშალოთ პარტნიორი?')) await deleteDoc(doc(db, "dist_partners", id));
   };
@@ -665,7 +706,7 @@ export default function DistributionDashboard() {
         })),
         totalPrice: orderTotal, status: 'მიმდინარე', createdAt: formattedDate, changesLog: [], rsUploaded: false 
       });
-      setCart([]); setSelectedPartner('');
+      setPartnerSearchQuery('');
       alert('შეკვეთა გაიგზავნა საწყობში!');
     } catch(err) { alert("ვერ გაიგზავნა: " + err.message); }
   };
@@ -704,6 +745,25 @@ export default function DistributionDashboard() {
       });
       alert('შეკვეთა ჩალაგდა!');
     } catch(err) { alert("შეცდომა ჩალაგებისას: " + err.message); }
+  };
+  // 💾 პრესელერის მიერ შეკვეთის რედაქტირების შენახვა
+  const handleSaveOrderEdits = async (orderId) => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    try {
+      // ვითვლით ახალ ჯამურ თანხას და ვაახლებთ originalQuantity-საც (რადგან თვითონ გადაიფიქრა)
+      const updatedItems = order.items.map(i => ({
+        ...i,
+        originalQuantity: i.quantity 
+      }));
+      const newTotal = updatedItems.reduce((sum, i) => sum + ((i.product.currentPrice || i.product.price) * i.quantity), 0);
+      
+      await updateDoc(doc(db, "dist_orders", orderId), { 
+        items: updatedItems, 
+        totalPrice: newTotal 
+      });
+      alert('✅ შეკვეთა წარმატებით განახლდა!');
+    } catch(err) { alert('❌ შეცდომა: ' + err.message); }
   };
   // ❌ შეკვეთის გაუქმება/წაშლა
   const handleCancelOrder = async (orderId) => {
@@ -798,6 +858,23 @@ export default function DistributionDashboard() {
     const { toEng, toGeo, directEng } = transliterate(queryLower);
     return nameLower.includes(queryLower) || nameLower.includes(toEng) || nameLower.includes(toGeo) || nameLower.includes(directEng);
   });
+  // 🔍 პარტნიორების ფილტრი პრესელერის ტაბისთვის (შეკვეთის გაფორმებისას)
+  const filteredSelectPartners = partners.filter(p => {
+    if (!partnerSearchQuery) return true;
+    const queryLower = partnerSearchQuery.toLowerCase();
+    const { toEng, toGeo, directEng } = transliterate(queryLower);
+    const nameLower = (p.name || '').toLowerCase();
+    return nameLower.includes(queryLower) || nameLower.includes(toEng) || nameLower.includes(toGeo) || nameLower.includes(directEng) || (p.tin && p.tin.includes(queryLower));
+  });
+
+  // 🔍 პარტნიორების ფილტრი ბაზის მართვის ტაბისთვის (სიის ფილტრაცია)
+  const filteredListPartners = partners.filter(p => {
+    if (!partnerListSearchQuery) return true;
+    const queryLower = partnerListSearchQuery.toLowerCase();
+    const { toEng, toGeo, directEng } = transliterate(queryLower);
+    const nameLower = (p.name || '').toLowerCase();
+    return nameLower.includes(queryLower) || nameLower.includes(toEng) || nameLower.includes(toGeo) || nameLower.includes(directEng) || (p.tin && p.tin.includes(queryLower));
+  });
 
   // ================= 📊 ანალიტიკის ლოგიკა (არქივისთვის) =================
   const analytics = (() => {
@@ -839,11 +916,21 @@ export default function DistributionDashboard() {
           <p className="text-emerald-600 text-xs mt-0.5 font-bold">🟢 Firebase ონლაინ რეჟიმი</p>
         </div>
         <div className="flex bg-slate-100 p-1 rounded-xl gap-1 w-full sm:w-auto overflow-x-auto">
+          {/* პრესელერის ტაბი ყველასთვის ჩანს */}
           <button onClick={() => setActiveTab('preseller')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'preseller' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🛒 პრესელერი</button>
-          <button onClick={() => setActiveTab('warehouse')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'warehouse' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🏬 საწყობი ({orders.length})</button>
-          <button onClick={() => setActiveTab('history')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'history' ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>📜 მიმდინარე კვირა</button>
-          <button onClick={() => setActiveTab('archive')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'archive' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🗄️ არქივი & ანალიტიკა</button>
-          <button onClick={() => setActiveTab('admin')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>⚙️ ბაზის მართვა</button>
+          <button onClick={() => setActiveTab('partners_tab')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'partners_tab' ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🤝 პარტნიორები</button>
+          {userRole === 'preseller' && (
+  <button onClick={() => setActiveTab('preseller_orders')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'preseller_orders' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>📦 გაგზავნილი შეკვეთები ({orders.length})</button>
+)}
+          {/* 🔒 დანარჩენი ტაბები გამოჩნდება მხოლოდ მაშინ, თუ მომხმარებელი არის 'admin' */}
+          {userRole === 'admin' && (
+            <>
+              <button onClick={() => setActiveTab('warehouse')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'warehouse' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🏬 საწყობი ({orders.length})</button>
+              <button onClick={() => setActiveTab('history')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'history' ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>📜 მიმდინარე კვირა</button>
+              <button onClick={() => setActiveTab('archive')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'archive' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>🗄️ არქივი & ანალიტიკა</button>
+              <button onClick={() => setActiveTab('admin')} className={`px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${activeTab === 'admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>⚙️ ბაზის მართვა</button>
+            </>
+          )}
         </div>
       </div>
 
@@ -897,12 +984,68 @@ export default function DistributionDashboard() {
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-4">
             <h2 className="text-lg font-bold text-slate-900 mb-4">შეკვეთის გაფორმება</h2>
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">პარტნიორი ობიექტი</label>
-              <select value={selectedPartner} onChange={e => setSelectedPartner(e.target.value)} className="w-full p-2.5 border rounded-xl bg-white text-sm font-semibold">
-                <option value="">-- აირჩიეთ პარტნიორი --</option>
-                {partners.map((p) => <option key={p.id} value={p.name}>{p.name} (ს/ნ: {p.tin})</option>)}
-              </select>
+              
+              {/* 🔍 საძიებო და ასარჩევი ველი ერთად (Autocomplete) */}
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="🔍 მოძებნე ობიექტი ან ს/ნ..."
+                  value={partnerSearchQuery} 
+                  onChange={e => {
+                    setPartnerSearchQuery(e.target.value);
+                    setIsPartnerDropdownOpen(true); // აკრეფისთანავე იშლება სია
+                    if (selectedPartner) setSelectedPartner(''); // თუ ახლიდან დაიწყო წერა, ძველი არჩევანი უქმდება
+                  }} 
+                  onFocus={() => setIsPartnerDropdownOpen(true)} // კლიკზეც იშლება სია
+                  className={`w-full p-2.5 border rounded-xl text-sm font-semibold outline-none transition ${selectedPartner ? 'bg-emerald-50 border-emerald-400 text-emerald-800' : 'bg-slate-50 focus:border-emerald-400'}`}
+                />
+                
+                {/* ✕ ღილაკი გასასუფთავებლად */}
+                {partnerSearchQuery && (
+                  <button 
+                    type="button" 
+                    onClick={() => { 
+                      setSelectedPartner(''); 
+                      setPartnerSearchQuery(''); 
+                      setIsPartnerDropdownOpen(true); 
+                    }}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-rose-500 font-bold"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* 📜 დინამიური ჩამოსაშლელი სია */}
+              {isPartnerDropdownOpen && (
+                <>
+                  {/* INVISIBLE OVERLAY: უხილავი ფონი, რომელიც კეტავს სიას სხვაგან დაკლიკებისას */}
+                  <div className="fixed inset-0 z-10" onClick={() => setIsPartnerDropdownOpen(false)}></div>
+                  
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                    {filteredSelectPartners.length > 0 ? (
+                      filteredSelectPartners.map((p) => (
+                        <div 
+                          key={p.id} 
+                          onClick={() => {
+                            setSelectedPartner(p.name);
+                            setPartnerSearchQuery(p.name); // არჩევისას ველში სახელი იწერება
+                            setIsPartnerDropdownOpen(false); // სია იხურება
+                          }}
+                          className="p-3 border-b border-slate-100 last:border-0 hover:bg-emerald-50 cursor-pointer transition flex justify-between items-center"
+                        >
+                          <span className="font-bold text-slate-800 text-sm">{p.name}</span>
+                          <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded">ს/ნ: {p.tin}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-xs text-slate-400 italic">ობიექტი ვერ მოიძებნა</div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
             {cart.length > 0 ? (
               <div className="bg-emerald-50/50 p-4 rounded-xl mb-4 border border-emerald-100/60">
@@ -925,6 +1068,141 @@ export default function DistributionDashboard() {
             )}
             <button type="button" onClick={submitOrder} className="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 transition text-sm">გაგზავნა საწყობში 🚀</button>
           </div>
+        </div>
+      )}
+      {/* 🤝 ახალი: პარტნიორების მართვის ტაბი (ჩანს ორივესთვის) */}
+      {activeTab === 'partners_tab' && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto animate-fadeIn mt-8">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">🤝 პარტნიორების მონაცემთა ბაზა</h2>
+          
+          <div className="flex flex-col gap-2 mb-6 bg-slate-50 p-4 rounded-xl border">
+            <p className="text-[10px] font-bold text-gray-400 uppercase">ახალი ობიექტის რეგისტრაცია</p>
+            <input type="text" placeholder="ობიექტის სახელი" value={newPartnerName} onChange={e => setNewPartnerName(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white" />
+            <input type="text" placeholder="საიდენტიფიკაციო კოდი" value={newPartnerTin} onChange={e => setNewPartnerTin(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white" />
+            <input type="text" placeholder="მიწოდების მისამართი" value={newPartnerAddress} onChange={e => setNewPartnerAddress(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white" />
+            <select value={newPartnerType} onChange={e => setNewPartnerType(e.target.value)} className="p-2 border rounded-lg text-xs outline-none bg-white font-bold text-indigo-700">
+              <option value="საცალო">🏪 საცალო (Retail)</option>
+              <option value="საბითუმო">🏭 საბითუმო (Wholesale)</option>
+            </select>
+            <button type="button" onClick={handleAddPartner} className="bg-purple-600 hover:bg-purple-700 text-white p-2.5 rounded-lg text-xs font-bold mt-1 transition">დამატება ბაზაში +</button>
+          </div>
+
+          {/* 🔍 სიის საძიებო ველი და სათაური */}
+          <div className="flex justify-between items-center mb-3 bg-slate-100 p-2 rounded-xl">
+            <p className="text-[10px] font-bold text-slate-500 uppercase px-2">არსებული ობიექტები ({filteredListPartners.length}):</p>
+            <input 
+              type="text" 
+              placeholder="🔍 მოძებნე სიაში..." 
+              value={partnerListSearchQuery} 
+              onChange={e => setPartnerListSearchQuery(e.target.value)} 
+              className="p-1.5 border rounded-lg text-xs bg-white outline-none w-1/2 focus:border-purple-400 transition"
+            />
+          </div>
+
+          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+            {filteredListPartners.map(partner => (
+              <div key={partner.id} className="p-3 border rounded-xl bg-slate-50/40 flex justify-between items-center text-xs transition-all">
+                
+                {editingPartnerId === partner.id ? (
+                  <div className="w-full space-y-2 bg-white p-3 rounded-lg border border-amber-200 shadow-sm">
+                    <p className="text-[10px] font-bold text-amber-600 uppercase">პარტნიორის რედაქტირება</p>
+                    <div className="flex gap-2">
+                      <input type="text" value={editPartnerName} onChange={e => setEditPartnerName(e.target.value)} className="w-full p-2 border rounded text-xs bg-slate-50 outline-none focus:border-amber-400" placeholder="სახელი" />
+                      <input type="text" value={editPartnerTin} onChange={e => setEditPartnerTin(e.target.value)} className="w-full p-2 border rounded text-xs bg-slate-50 outline-none focus:border-amber-400" placeholder="საიდენტიფიკაციო კოდი" />
+                    </div>
+                    <div className="flex gap-2">
+                      <input type="text" value={editPartnerAddress} onChange={e => setEditPartnerAddress(e.target.value)} className="w-full p-2 border rounded text-xs bg-slate-50 outline-none focus:border-amber-400" placeholder="მისამართი" />
+                      <select value={editPartnerType} onChange={e => setEditPartnerType(e.target.value)} className="p-2 border rounded text-xs bg-white text-indigo-700 font-bold outline-none">
+                        <option value="საცალო">საცალო</option>
+                        <option value="საბითუმო">საბითუმო</option>
+                      </select>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-2">
+                      <button type="button" onClick={() => setEditingPartnerId(null)} className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded font-bold transition">გაუქმება</button>
+                      <button type="button" onClick={() => savePartnerEdit(partner.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded font-bold transition shadow-sm">შენახვა ✓</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-full">
+                      <span className="font-bold text-slate-700 block text-sm">🏪 {partner.name}</span>
+                      <span className="text-[11px] text-gray-400 mt-0.5 block">ს/ნ: {partner.tin} | 📍 {partner.address} | 🏷️ {partner.type || 'საცალო'}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => startEditPartner(partner)} className="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1.5 rounded-lg font-bold transition-colors text-xs flex items-center" title="რედაქტირება">✏️</button>
+                      <button type="button" onClick={() => handleDeletePartner(partner.id)} className="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2.5 py-1.5 rounded-lg font-black transition-colors text-xs flex items-center" title="წაშლა">✕</button>
+                    </div>
+                  </>
+                )}
+                
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* 📦 ახალი: პრესელერის მიერ გაგზავნილი შეკვეთების მართვა */}
+      {activeTab === 'preseller_orders' && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-4xl mx-auto animate-fadeIn mt-8">
+          <h2 className="text-lg font-bold text-slate-900 mb-2">📦 გაგზავნილი (აქტიური) შეკვეთები</h2>
+          <p className="text-xs text-gray-500 mb-6">აქ ჩანს საწყობში გადაგზავნილი შეკვეთები, რომლებიც ჯერ არ ჩალაგებულა. შეგიძლიათ შეცვალოთ რაოდენობა ან სრულად წაშალოთ.</p>
+          
+          {orders.length === 0 ? (
+            <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200 border-dashed text-gray-400 italic text-sm">გაგზავნილი შეკვეთები არ მოიძებნა</div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div key={order.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 shadow-sm">
+                  <div className="flex justify-between items-center mb-3 border-b pb-2">
+                    <div>
+                      <h3 className="font-black text-slate-800 text-sm">🏪 {order.partner}</h3>
+                      <p className="text-[10px] text-gray-500 mt-0.5">📅 {order.createdAt}</p>
+                    </div>
+                    <div className="text-right">
+                       <span className="text-blue-600 font-black text-sm">{order.totalPrice.toFixed(2)} ₾</span>
+                    </div>
+                  </div>
+                  
+                  <div className="overflow-x-auto mb-3">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-100 text-slate-500 font-bold">
+                        <tr>
+                          <th className="p-2 rounded-l-lg">პროდუქტი</th>
+                          <th className="p-2 text-center">რაოდენობა</th>
+                          <th className="p-2 text-right rounded-r-lg">ფასი</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {order.items.map(item => (
+                          <tr key={item.product.id}>
+                            <td className="p-2 font-bold text-slate-700">{item.product.name}</td>
+                            <td className="p-2 text-center">
+                              {/* ვიყენებთ არსებულ ფუნქციას რაოდენობის ლოკალურად შესაცვლელად */}
+                              <input 
+                                type="number" 
+                                value={item.quantity} 
+                                onChange={e => handleQuantityChangeInWarehouse(order.id, item.product.id, e.target.value)} 
+                                className="w-16 p-1 border rounded font-black text-center outline-none focus:border-blue-400" 
+                              />
+                            </td>
+                            <td className="p-2 text-right font-mono text-slate-600">{((item.product.currentPrice || item.product.price) * item.quantity).toFixed(2)} ₾</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
+                    <button type="button" onClick={() => handleCancelOrder(order.id)} className="bg-rose-100 text-rose-700 px-4 py-2 rounded-lg hover:bg-rose-200 font-bold text-xs transition">
+                      🗑️ სრულად გაუქმება
+                    </button>
+                    <button type="button" onClick={() => handleSaveOrderEdits(order.id)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-bold text-xs transition shadow-sm">
+                      💾 ცვლილებების შენახვა
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
