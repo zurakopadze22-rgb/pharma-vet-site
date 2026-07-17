@@ -1,7 +1,54 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Info, Search, Factory, ChevronDown, ChevronUp, Target, Filter } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const ProductCatalog = ({ onProductClick, lang, t, allProducts = [] }) => {
+  const seoInfo = {
+    GE: {
+      title: "ვეტერინარული პროდუქციის კატალოგი | Pharma Vet",
+      description: "დაათვალიერეთ ფარმავეტის ვეტერინარული პრეპარატების, ვიტამინებისა და საკვები დანამატების სრული კატალოგი. საუკეთესო ხარისხის ევროპული პროდუქცია თქვენი ცხოველებისთვის.",
+      keywords: "ვეტერინარული მედიკამენტები, ვიტამინები ცხოველებისთვის, საკვები დანამატები, ფარმაკოლოგია, კატალოგი"
+    },
+    EN: {
+      title: "Veterinary Products Catalog | Pharma Vet",
+      description: "Browse Pharma Vet's full catalog of veterinary pharmaceuticals, vitamins, and supplements. Top quality European products for your animals.",
+      keywords: "veterinary drugs, pet vitamins, feed supplements, pharmacology catalog"
+    },
+    RU: {
+      title: "Каталог ветеринарной продукции | Pharma Vet",
+      description: "Ознакомьтесь с полным каталогом ветеринарных препаратов, витаминов и добавок Pharma Vet. Европейское качество для ваших животных.",
+      keywords: "ветеринарные лекарства, витамины для животных, пищевые добавки, фармакологический каталог"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+        "item": "https://www.pharmavet.ge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === 'GE' ? 'პროდუქცია' : lang === 'EN' ? 'Products' : 'Продукция',
+        "item": "https://www.pharmavet.ge/products"
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeSub, setActiveSub] = useState('all');
   const [activeSpecies, setActiveSpecies] = useState('all');

@@ -11,13 +11,13 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-24">
           
           {/* Logo Section */}
           <div className="flex items-center gap-3 md:gap-6 cursor-pointer group" onClick={() => handleNavClick('home')}>
-            <img src="/logo.png" alt="Logo" className="h-10 md:h-16 object-contain" />
+            <img src="/logo.webp" alt="Logo" className="h-14 md:h-20 object-contain bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100/50" />
             
-            <div className="flex flex-col border-l border-slate-200 pl-3 md:pl-6 text-[9px] md:text-sm">
+            <div className="flex flex-col border-l border-slate-200 pl-3 md:pl-6 text-[10px] md:text-base">
               <span className="font-black text-slate-950 uppercase tracking-tighter leading-none">
                 {t.slogan1 || "უკეთესი ხარისხი"}
               </span>
@@ -26,28 +26,28 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
               </span>
             </div>
           </div>
-
+ 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8 items-center">
-            <button onClick={() => setView('products')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'products' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            <button onClick={() => setView('products')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'products' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.products}
             </button>
-            <button onClick={() => setView('partners')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'partners' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            <button onClick={() => setView('partners')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'partners' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.partners}
             </button>
             
             {/* ბლოგის ღილაკი (Desktop) */}
-            <button onClick={() => setView('blog')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'blog' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+            <button onClick={() => setView('blog')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'blog' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.blog}
             </button>
-
-            <button onClick={() => setView('about')} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${view === 'about' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
+ 
+            <button onClick={() => setView('about')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'about' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.about}
             </button>
             
             <button 
               onClick={() => setView('become-partner')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 bg-white border-teal-500 text-teal-600 hover:bg-teal-500 hover:text-white"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border-2 bg-white border-teal-500 text-teal-600 hover:bg-teal-500 hover:text-white"
             >
               <Handshake className="w-4 h-4" />
               {lang === 'GE' ? 'გახდი პარტნიორი' : lang === 'EN' ? 'Become a Partner' : 'Стать партнером'}
@@ -59,7 +59,7 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
                 <button 
                   key={l}
                   onClick={() => setLang(l)}
-                  className={`text-[11px] font-black transition-colors ${lang === l ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`text-xs md:text-[14px] font-black transition-colors ${lang === l ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   {l}
                 </button>

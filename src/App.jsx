@@ -63,7 +63,7 @@ const App = () => {
           {/* ================= მთავარი საიტი ================= */}
           <Route path="/" element={
             <>
-              <Hero t={t.hero} setView={(path) => navigate(`/${path}`)} />
+              <Hero t={t.hero} lang={lang} setView={(path) => navigate(`/${path}`)} />
               <Shop t={t.shop} lang={lang} products={productsData} onProductClick={handleProductClick} />
               <TrustSection lang={lang} />
               <BrandsSlider lang={lang} />

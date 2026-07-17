@@ -1,8 +1,55 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Calendar, ArrowRight, BookOpen } from 'lucide-react';
 import { blogArticles } from '../data/blogData';
+import { useSEO } from '../hooks/useSEO';
 
 const Blog = ({ lang, t, onArticleClick }) => {
+  const seoInfo = {
+    GE: {
+      title: "ვეტერინარული ბლოგი - რჩევები და სტატიები | Pharma Vet",
+      description: "წაიკითხეთ პროფესიონალური სტატიები ცხოველთა მოვლის, დაავადებების პრევენციის, კვებისა და ჯანმრთელობის შესახებ Pharma Vet-ის ექსპერტებისგან.",
+      keywords: "ვეტერინარული ბლოგი, რჩევები ცხოველებზე, ძაღლის მოვლა, კატის დაავადებები, საქონლის მასტიტი"
+    },
+    EN: {
+      title: "Veterinary Blog - Advices & Articles | Pharma Vet",
+      description: "Read professional articles on animal care, disease prevention, nutrition, and health from Pharma Vet experts.",
+      keywords: "veterinary blog, animal care tips, dog care, cat diseases, dairy cattle mastitis"
+    },
+    RU: {
+      title: "Ветеринарный блог - Советы и статьи | Pharma Vet",
+      description: "Читайте профессиональные статьи об уходе за животными, профилактике заболеваний, питании и здоровье от экспертов Pharma Vet.",
+      keywords: "ветеринарный блог, советы по уходу за животными, уход за собаками, болезни кошек, мастит КРС"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+        "item": "https://www.pharmavet.ge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === 'GE' ? 'ბლოგი' : lang === 'EN' ? 'Blog' : 'Блог',
+        "item": "https://www.pharmavet.ge/blog"
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState("all");
 

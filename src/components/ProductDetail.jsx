@@ -5,6 +5,7 @@ import {
   Package, Info, ChevronDown, BookOpen, Globe 
 } from 'lucide-react';
 import { translations } from "../translations";
+import { useSEO } from '../hooks/useSEO';
 
 const ProductDetail = ({ lang, allProducts = [], onProductClick, t }) => {
   const { slug } = useParams(); // URL-დან ვიღებთ პროდუქტის სლაგს
@@ -36,57 +37,74 @@ const ProductDetail = ({ lang, allProducts = [], onProductClick, t }) => {
     return ct[key] || sub;
   };
 
-  const jsonLd = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": product.name[lang],
-    // აქ ვამოწმებთ: თუ product.image უკვე შეიცავს http-ს, პირდაპირ მას ვიყენებთ.
-    // თუ არ შეიცავს (მაგალითად არის "/img/vet.jpg"), მაშინ ვამატებთ საიტის დომენს.
-    "image": product.image.startsWith('http') 
-      ? product.image 
-      : `https://pharmavet.ge${product.image}`,
-    "description": product.purpose?.[lang] || "",
-    "brand": {
-      "@type": "Brand",
-      "name": product.manufacturer
-    },
-    "offers": {
-      "@type": "Offer",
-      "url": window.location.href,
-      "priceCurrency": "GEL",
-      "price": product.price.toString(),
-      "availability": "https://schema.org/InStock",
-      "itemCondition": "https://schema.org/NewCondition",
-      "priceValidUntil": "2027-01-01"
-    },
-    "sku": `PV-${product.id}`,
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "5",
-      "reviewCount": "1"
-    }
-  };
-  useEffect(() => {
-  if (product) {
-    // ტაბის სახელის შეცვლა
-    document.title = `${product.name[lang]} | ${brandName}`;
-    
-    // OG Meta Tags (გაზიარებისთვის)
-    const updateMeta = (property, content) => {
-      let element = document.querySelector(`meta[property="${property}"]`);
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute('property', property);
-        document.head.appendChild(element);
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": product.name[lang],
+        "image": product.image.startsWith('http') 
+          ? product.image 
+          : `https://www.pharmavet.ge${product.image}`,
+        "description": product.purpose?.[lang] || "",
+        "brand": {
+          "@type": "Brand",
+          "name": product.manufacturer
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": window.location.href,
+          "priceCurrency": "GEL",
+          "price": product.price.toString(),
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition",
+          "priceValidUntil": "2027-01-01"
+        },
+        "sku": `PV-${product.id}`,
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "reviewCount": "1"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+            "item": "https://www.pharmavet.ge/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": lang === 'GE' ? 'პროდუქცია' : lang === 'EN' ? 'Products' : 'Продукция',
+            "item": "https://www.pharmavet.ge/products"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": product.name[lang],
+            "item": `https://www.pharmavet.ge/product/${product.slug}`
+          }
+        ]
       }
-      element.setAttribute('content', content);
-    };
+    ]
+  };
 
-    updateMeta('og:title', product.name[lang]);
-    updateMeta('og:description', product.purpose?.[lang] || "");
-    updateMeta('og:image', `https://www.pharmavet.ge${product.image}`);
-  }
-}, [product, lang, brandName,slug]);
+  useSEO({
+    title: `${product.name[lang]} | ${brandName}`,
+    description: product.purpose?.[lang] || "",
+    keywords: `${product.name[lang]}, ${product.manufacturer}, ${getSubCategoryLabel(product.sub) || ""}, ვეტერინარული პრეპარატები`,
+    ogTitle: product.name[lang],
+    ogDescription: product.purpose?.[lang] || "",
+    ogImage: product.image.startsWith('http') 
+      ? product.image 
+      : `https://www.pharmavet.ge${product.image}`,
+    schema,
+    lang
+  });
 
   const similarProducts = useMemo(() => {
     if (!allProducts || !product) return [];
@@ -98,14 +116,7 @@ const ProductDetail = ({ lang, allProducts = [], onProductClick, t }) => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-700">
       
-      {/* --- SEO & Metadata --- */}
-      {/* გაითვალისწინე: React Helmet-ის გარეშე title ტეგი JSX-ში პირდაპირ არ იმუშავებს, 
-          თუმცა სტრუქტურულად აქ იყოს */}
-      <title>{`${product.name[lang]} | ${brandName}`}</title>
-      
-      <script type="application/ld+json">
-        {JSON.stringify(jsonLd)}
-      </script>
+
 
       <button 
         onClick={() => navigate('/products')} 

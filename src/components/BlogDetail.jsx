@@ -2,12 +2,82 @@ import React, { useState } from 'react';
 import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, CheckCircle2, Lightbulb } from 'lucide-react';
 import { useParams } from 'react-router-dom'; // დაამატე ეს
 import { blogArticles } from '../data/blogData';
+import { useSEO } from '../hooks/useSEO';
+
 const BlogDetail = ({ lang, t, onBack }) => {
   const { slug } = useParams(); // URL-იდან იღებს slug-ს
   const [copied, setCopied] = useState(false);
 
   // ვპოულობთ შესაბამის სტატიას მასივში
   const article = blogArticles.find(a => a.slug === slug);
+  const isArticleAvailable = !!article;
+
+  const articleTitle = isArticleAvailable ? article.title[lang] : '';
+  const articleExcerpt = isArticleAvailable ? article.excerpt[lang] : '';
+  const articleImage = isArticleAvailable 
+    ? (article.image.startsWith('http') ? article.image : `https://www.pharmavet.ge${article.image}`)
+    : '';
+  const articleUrl = isArticleAvailable ? `https://www.pharmavet.ge/blog/${article.slug}` : '';
+
+  const schema = isArticleAvailable ? {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "headline": articleTitle,
+        "image": articleImage,
+        "datePublished": article.date,
+        "description": articleExcerpt,
+        "url": articleUrl,
+        "author": {
+          "@type": "Organization",
+          "name": "Pharma Vet"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Pharma Vet",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.pharmavet.ge/logo.webp"
+          }
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+            "item": "https://www.pharmavet.ge/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": lang === 'GE' ? 'ბლოგი' : lang === 'EN' ? 'Blog' : 'Блог',
+            "item": "https://www.pharmavet.ge/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": articleTitle,
+            "item": articleUrl
+          }
+        ]
+      }
+    ]
+  } : null;
+
+  useSEO({
+    title: isArticleAvailable ? `${articleTitle} | Pharma Vet` : 'ბლოგი | Pharma Vet',
+    description: articleExcerpt,
+    keywords: isArticleAvailable ? `${articleTitle}, ვეტერინარული ბლოგი, რჩევები ცხოველებზე` : '',
+    ogTitle: articleTitle,
+    ogDescription: articleExcerpt,
+    ogImage: articleImage,
+    schema,
+    lang
+  });
 
   if (!article) {
     return (

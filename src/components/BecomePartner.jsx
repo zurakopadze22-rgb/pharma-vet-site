@@ -1,7 +1,54 @@
 import React from 'react';
 import { CheckCircle2, ArrowRight, Building2, ShieldCheck, Zap, Phone, TrendingDown, PlayCircle } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const BecomePartner = ({ lang }) => {
+  const seoInfo = {
+    GE: {
+      title: "გახდი პარტნიორი - თანამშრომლობა ვეტ-აფთიაქებთან | Pharma Vet",
+      description: "შემოუერთდით Pharma Vet-ის პარტნიორთა ქსელს. გთავაზობთ განსაკუთრებულ პირობებს ვეტერინარულ აფთიაქებსა და კლინიკებს ევროპულ პრეპარატებზე.",
+      keywords: "თანამშრომლობა ვეტერინარებთან, ვეტერინარული დისტრიბუცია, გახდი პარტნიორი ფარმავეტი"
+    },
+    EN: {
+      title: "Become a Partner - Cooperation with Vet Pharmacies | Pharma Vet",
+      description: "Join the Pharma Vet partner network. We offer special partnership terms for veterinary pharmacies and clinics on European pharmaceuticals.",
+      keywords: "cooperation with veterinarians, veterinary distribution, become a partner pharmavet"
+    },
+    RU: {
+      title: "Стать партнером - Сотрудничество с ветаптеками | Pharma Vet",
+      description: "Присоединяйтесь к партнерской сети Pharma Vet. Предлагаем специальные условия сотрудничества для ветаптек и клиник на европейские препараты.",
+      keywords: "сотрудничество с ветеринарами, ветеринарная дистрибуция, стать партнером фармавет"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+        "item": "https://www.pharmavet.ge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === 'GE' ? 'გახდი პარტნიორი' : lang === 'EN' ? 'Become Partner' : 'Стать партнером',
+        "item": "https://www.pharmavet.ge/become-partner"
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   const content = {
     GE: {
       title: "გახდი ჩვენი პარტნიორი",

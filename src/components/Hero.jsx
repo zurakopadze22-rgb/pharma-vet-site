@@ -1,7 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
-const Hero = ({ t, setView }) => {
+const Hero = ({ t, lang, setView }) => {
+  const seoInfo = {
+    GE: {
+      title: "Pharma Vet • ვეტერინარული პრეპარატები & პროფესიონალური ბლოგი • Veterinary Care",
+      description: "Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი და დისტრიბუცია. პროფესიონალური რჩევები ცხოველების მოვლის, კვებისა და ჯანმრთელობის შესახებ. Veterinary pharmaceuticals and expert blog.",
+      keywords: "ვეტერინარული პრეპარატები, ცხოველების წამლები, რჩევები ცხოველებზე, ვეტერინარული ბლოგი, ძაღლის კვება, კატის ვიტამინები, ვეტერინარია საქართველო, ფარმავეტი, ფუტკრის მოვლა, მეცხოველეობა, pharmavet.ge"
+    },
+    EN: {
+      title: "Pharma Vet • Veterinary Pharmaceuticals & Expert Blog",
+      description: "Pharma Vet Georgia - Import and distribution of veterinary pharmaceuticals. Professional advice on animal care, nutrition, and health.",
+      keywords: "veterinary medicine, veterinary blog, animal care tips, animal health, pet nutrition, animal care, animal treatment, veterinary drugs, pharmavet"
+    },
+    RU: {
+      title: "Pharma Vet • Ветеринарные препараты и экспертный блог",
+      description: "Pharma Vet Georgia - Импорт и дистрибуция ветеринарных препаратов. Профессиональные советы по уходу за животными, питанию и здоровью.",
+      keywords: "ветеринарные препараты, лекарства для животных, ветеринарный блог, ветеринария, витамины для собак, уход за животными, фармавет"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.pharmavet.ge/#website",
+        "url": "https://www.pharmavet.ge/",
+        "name": "Pharma Vet",
+        "description": "Professional veterinary pharmaceuticals distribution and educational blog for animal health and care.",
+        "publisher": {
+          "@id": "https://www.pharmavet.ge/#organization"
+        },
+        "inLanguage": lang === 'GE' ? 'ka' : lang.toLowerCase()
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://www.pharmavet.ge/#organization",
+        "name": "Pharma Vet",
+        "alternateName": ["ფარმავეტი", "Фарма Вет", "Pharmavet.ge"],
+        "url": "https://www.pharmavet.ge/",
+        "logo": "https://www.pharmavet.ge/logo.webp",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "areaServed": "GE",
+          "availableLanguage": ["Georgian", "English", "Russian"]
+        },
+        "sameAs": [
+          "https://www.facebook.com/pharmavet.ge"
+        ]
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [

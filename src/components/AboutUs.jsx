@@ -1,7 +1,54 @@
 import React from 'react';
 import { Target, ShieldCheck } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
-const AboutUs = ({ t }) => {
+const AboutUs = ({ t, lang }) => {
+  const seoInfo = {
+    GE: {
+      title: "ჩვენ შესახებ - ისტორია და მისია | Pharma Vet",
+      description: "Pharma Vet - ევროპული ვეტერინარული პრეპარატების ლიდერი იმპორტიორი და დისტრიბუტორი საქართველოში. გაიგეთ მეტი ჩვენი მისიისა და ხარისხის გარანტიის შესახებ.",
+      keywords: "ფარმავეტი ისტორია, ვეტერინარია საქართველო, ევროპული ვეტერინარული პრეპარატები"
+    },
+    EN: {
+      title: "About Us - History and Mission | Pharma Vet",
+      description: "Pharma Vet - Leading importer and distributor of European veterinary pharmaceuticals in Georgia. Learn more about our mission and quality assurance.",
+      keywords: "pharmavet history, veterinary medicine georgia, european veterinary medicine"
+    },
+    RU: {
+      title: "О нас - История и миссия | Pharma Vet",
+      description: "Pharma Vet - Ведущий импортер и дистрибьютор европейских ветеринарных препаратов в Грузии. Узнайте больше о нашей миссии и гарантии качества.",
+      keywords: "история фармавет, ветеринария в грузии, европейские ветеринарные препараты"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+        "item": "https://www.pharmavet.ge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === 'GE' ? 'ჩვენ შესახებ' : lang === 'EN' ? 'About Us' : 'О нас',
+        "item": "https://www.pharmavet.ge/about"
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   return (
     <div className="animate-in fade-in duration-1000">
       {/* ჰერო სექცია სურათით - შენარჩუნებული ვიზუალი */}

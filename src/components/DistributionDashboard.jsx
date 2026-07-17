@@ -368,7 +368,7 @@ export default function DistributionDashboard() {
   const printDate = `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getFullYear()}`;
 
   // 🌐 ვიღებთ შენი ლოკალური ფაილის სრულ, აბსოლუტურ მისამართს
-  const logoUrl = `${window.location.origin}/logo.png`; 
+  const logoUrl = `${window.location.origin}/logo.webp`; 
 
   const printWindow = window.open('', '_blank');
   printWindow.document.write(`

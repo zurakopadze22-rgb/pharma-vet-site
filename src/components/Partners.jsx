@@ -1,8 +1,55 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { MapPin, Phone, ChevronRight, MapPinned, Search, ChevronDown, Factory } from 'lucide-react';
 import { partnersData } from '../data/partners';
+import { useSEO } from '../hooks/useSEO';
 
 const Partners = ({ lang, t, onPartnerClick }) => {
+  const seoInfo = {
+    GE: {
+      title: "ჩვენი პარტნიორები - კლინიკები და აფთიაქები | Pharma Vet",
+      description: "იპოვეთ Pharma Vet-ის ოფიციალური პარტნიორი ვეტერინარული კლინიკები, აფთიაქები და სადისტრიბუციო წერტილები მთელ საქართველოში.",
+      keywords: "პარტნიორი კლინიკები, ვეტერინარული აფთიაქები, ფარმავეტი პარტნიორები, ვეტკლინიკები თბილისი"
+    },
+    EN: {
+      title: "Our Partners - Clinics and Pharmacies | Pharma Vet",
+      description: "Find Pharma Vet's official partner veterinary clinics, pharmacies, and distribution points across Georgia.",
+      keywords: "partner clinics, veterinary pharmacies, pharmavet partners, vet clinics georgia"
+    },
+    RU: {
+      title: "Наши партнеры - Клиники и аптеки | Pharma Vet",
+      description: "Найдите официальные партнерские ветеринарные клиники, аптеки и пункты дистрибуции Pharma Vet по всей Грузии.",
+      keywords: "партнерские клиники, ветеринарные аптеки, партнеры фармавет, ветклиники грузия"
+    }
+  };
+
+  const currentSEO = seoInfo[lang] || seoInfo.GE;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+        "item": "https://www.pharmavet.ge/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === 'GE' ? 'პარტნიორები' : lang === 'EN' ? 'Partners' : 'Партнеры',
+        "item": "https://www.pharmavet.ge/partners"
+      }
+    ]
+  };
+
+  useSEO({
+    title: currentSEO.title,
+    description: currentSEO.description,
+    keywords: currentSEO.keywords,
+    schema,
+    lang
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCity, setSelectedCity] = useState('all');
   const [isCityOpen, setIsCityOpen] = useState(false);

@@ -1,8 +1,74 @@
 // src/components/PartnerDetail.jsx
 import React from 'react';
 import { ArrowLeft, MapPin, Phone, ExternalLink, Clock } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const PartnerDetail = ({ partner, lang, onBack, t }) => {
+  const isPartnerAvailable = !!partner;
+
+  // We only run SEO if partner exists
+  const partnerName = isPartnerAvailable ? partner.name[lang] : '';
+  const partnerAddress = isPartnerAvailable ? partner.address[lang] : '';
+  const partnerPhone = isPartnerAvailable ? partner.phone : '';
+  const partnerImage = isPartnerAvailable 
+    ? (partner.image.startsWith('http') ? partner.image : `https://www.pharmavet.ge${partner.image}`)
+    : '';
+
+  const schema = isPartnerAvailable ? {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "name": partnerName,
+        "image": partnerImage,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": partnerAddress,
+          "addressLocality": partner.city,
+          "addressCountry": "GE"
+        },
+        "telephone": partnerPhone,
+        "openingHours": partner.workHours === '24/7' ? 'Mo-Su 00:00-24:00' : 'Mo-Su 09:00-18:00',
+        "url": partner.mapLink || window.location.href
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": lang === 'GE' ? 'მთავარი' : lang === 'EN' ? 'Home' : 'Главная',
+            "item": "https://www.pharmavet.ge/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": lang === 'GE' ? 'პარტნიორები' : lang === 'EN' ? 'Partners' : 'Партнеры',
+            "item": "https://www.pharmavet.ge/partners"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": partnerName,
+            "item": window.location.href
+          }
+        ]
+      }
+    ]
+  } : null;
+
+  useSEO({
+    title: isPartnerAvailable ? `${partnerName} - პარტნიორი ობიექტი | Pharma Vet` : 'პარტნიორი ობიექტი | Pharma Vet',
+    description: isPartnerAvailable 
+      ? `${partnerName} - ვეტერინარული კლინიკა/აფთიაქი მისამართზე: ${partnerAddress}. სამუშაო საათები: ${partner.workHours}.`
+      : '',
+    keywords: isPartnerAvailable ? `${partnerName}, partner clinic, ${partnerAddress}` : '',
+    ogTitle: partnerName,
+    ogDescription: partnerAddress,
+    ogImage: partnerImage,
+    schema,
+    lang
+  });
   if (!partner) return null;
 
   return (
