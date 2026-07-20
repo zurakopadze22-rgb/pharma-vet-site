@@ -4,7 +4,12 @@ import {
   collection, doc, onSnapshot, query, where, updateDoc 
 } from "firebase/firestore";
 
-const COURIER_CODE = String(import.meta.env.VITE_COURIER_PIN || '3333').trim();
+const getCourierPin = () => {
+  const pin = import.meta.env.VITE_COURIER_PIN;
+  if (!pin || pin === 'undefined') return '3333';
+  return String(pin).trim();
+};
+const COURIER_CODE = getCourierPin();
 
 export default function CourierDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
