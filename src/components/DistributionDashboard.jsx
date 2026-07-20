@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import {
   collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, setDoc, getDoc
@@ -6,8 +7,14 @@ import {
 
 const ADMIN_CODE = import.meta.env.VITE_ADMIN_PIN;
 const PRESELLER_CODE = import.meta.env.VITE_PRESELLER_PIN;
+const COURIER_CODE = (() => {
+  const pin = import.meta.env.VITE_COURIER_PIN;
+  if (!pin || pin === 'undefined') return '3333';
+  return String(pin).trim();
+})();
 
 export default function DistributionDashboard() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [authCode, setAuthCode] = useState('');
@@ -173,12 +180,15 @@ export default function DistributionDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (authCode === ADMIN_CODE) {
+    const trimmedCode = String(authCode).trim();
+    if (trimmedCode === String(ADMIN_CODE).trim()) {
       setUserRole('admin');
       setIsAuthenticated(true);
-    } else if (authCode === PRESELLER_CODE) {
+    } else if (trimmedCode === String(PRESELLER_CODE).trim()) {
       setUserRole('preseller');
       setIsAuthenticated(true);
+    } else if (trimmedCode === COURIER_CODE) {
+      navigate('/courier');
     } else {
       alert('არასწორი კოდი!');
     }
