@@ -12,7 +12,7 @@ const getCourierPin = () => {
 const COURIER_CODE = getCourierPin();
 
 export default function CourierDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('courier_authenticated') === 'true');
   const [authCode, setAuthCode] = useState('');
   const [activeTab, setActiveTab] = useState('deliveries'); 
 
@@ -52,6 +52,7 @@ export default function CourierDashboard() {
   const handleLogin = (e) => {
     e.preventDefault();
     if (String(authCode).trim() === COURIER_CODE) {
+      sessionStorage.setItem('courier_authenticated', 'true');
       setIsAuthenticated(true);
     } else {
       alert(`არასწორი კოდი!\nშეყვანილია: "${String(authCode).trim()}"\nბაზაშია: "${COURIER_CODE}"`);

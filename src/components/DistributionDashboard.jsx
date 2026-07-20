@@ -188,6 +188,7 @@ export default function DistributionDashboard() {
       setUserRole('preseller');
       setIsAuthenticated(true);
     } else if (trimmedCode === COURIER_CODE) {
+      sessionStorage.setItem('courier_authenticated', 'true');
       navigate('/courier');
     } else {
       alert(`არასწორი კოდი!\nშეყვანილია: "${trimmedCode}"\nბაზაშია:\n- admin: "${String(ADMIN_CODE).trim()}"\n- preseller: "${String(PRESELLER_CODE).trim()}"\n- courier: "${COURIER_CODE}"`);
