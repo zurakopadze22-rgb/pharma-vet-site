@@ -4,7 +4,7 @@ import {
   collection, doc, onSnapshot, query, where, updateDoc 
 } from "firebase/firestore";
 
-const COURIER_CODE = import.meta.env.VITE_COURIER_PIN || '3333';
+const COURIER_CODE = String(import.meta.env.VITE_COURIER_PIN || '3333').trim();
 
 export default function CourierDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,7 +46,7 @@ export default function CourierDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (authCode === COURIER_CODE) {
+    if (String(authCode).trim() === COURIER_CODE) {
       setIsAuthenticated(true);
     } else {
       alert('არასწორი კოდი!');
