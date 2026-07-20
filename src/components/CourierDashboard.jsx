@@ -11,6 +11,28 @@ const getCourierPin = () => {
 };
 const COURIER_CODE = getCourierPin();
 
+const latinToGeoPhonetic = (str) => {
+  if (!str) return { geo: '', altGeo: '' };
+  let res = str.toLowerCase();
+  
+  // replace multi-character mappings first
+  res = res.replace(/sh/g, 'შ');
+  res = res.replace(/ch/g, 'ჩ');
+  res = res.replace(/ts/g, 'ც');
+  res = res.replace(/dz/g, 'ძ');
+  res = res.replace(/kh/g, 'ხ');
+  res = res.replace(/gh/g, 'ღ');
+  
+  // single character mappings
+  const mapping = {
+    'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'v': 'ვ', 'z': 'ზ', 't': 'ტ', 'i': 'ი', 'k': 'კ', 'l': 'ლ', 'm': 'მ', 'n': 'ნ', 'o': 'ო', 'p': 'პ', 'j': 'ჯ', 'r': 'რ', 's': 'ს', 'u': 'უ', 'f': 'ფ', 'q': 'ქ', 'y': 'ყ', 'x': 'ხ', 'h': 'ჰ', 'w': 'წ', 'c': 'ც'
+  };
+  
+  const geo = res.split('').map(char => mapping[char] || char).join('');
+  const altGeo = geo.replace(/ტ/g, 'თ').replace(/წ/g, 'ვ').replace(/ყ/g, 'ი');
+  return { geo, altGeo };
+};
+
 export default function CourierDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('courier_authenticated') === 'true');
   const [authCode, setAuthCode] = useState('');
@@ -155,15 +177,18 @@ export default function CourierDashboard() {
   // All long-term outstanding debts (amountRemaining > 0) across both active and archived
   const outstandingDebts = orders.filter(o => o.amountRemaining > 0);
 
-  // Helper search filters
   const filterByQuery = (list) => {
     if (!searchQuery) return list;
-    const q = searchQuery.toLowerCase().trim();
-    return list.filter(o => 
-      (o.partner && o.partner.toLowerCase().includes(q)) || 
-      (o.partnerAddress && o.partnerAddress.toLowerCase().includes(q)) || 
-      (o.partnerTin && o.partnerTin.toLowerCase().includes(q))
-    );
+    const qRaw = searchQuery.toLowerCase().trim();
+    const { geo, altGeo } = latinToGeoPhonetic(qRaw);
+    return list.filter(o => {
+      const partner = (o.partner || '').toLowerCase();
+      const address = (o.partnerAddress || '').toLowerCase();
+      const tin = (o.partnerTin || '').toLowerCase();
+      return partner.includes(qRaw) || partner.includes(geo) || partner.includes(altGeo) ||
+             address.includes(qRaw) || address.includes(geo) || address.includes(altGeo) ||
+             tin.includes(qRaw) || tin.includes(geo) || tin.includes(altGeo);
+    });
   };
 
   const filteredDeliveries = filterByQuery(activeDeliveries);
