@@ -25,6 +25,7 @@ import { productsData } from './data/products';
 
 // 🚀 შემოგვაქვს შენი ახალი პანელი, რომელიც ნაბიჯი 1-ში შევქმენით
 import DistributionDashboard from './components/DistributionDashboard'; 
+import CourierDashboard from './components/CourierDashboard';
 
 const App = () => {
   const [lang, setLang] = useState('GE'); 
@@ -42,14 +43,14 @@ const App = () => {
   const handleArticleClick = (article) => navigate(`/blog/${article.slug}`);
   const handlePartnerClick = (partner) => navigate('/partner-detail', { state: { partner } });
 
-  // ამოწმებს, ადმინის პანელში ვართ თუ არა
-  const isDistributionPage = location.pathname === '/admin';
+  // ამოწმებს, შიდა პანელებში ვართ თუ არა
+  const isDashboardPage = location.pathname === '/admin' || location.pathname === '/courier';
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
-      {/* ნავბარი დაიმალება, როცა ვართ /admin გვერდზე */}
-      {!isDistributionPage && (
+      {/* ნავბარი დაიმალება, როცა ვართ შიდა პანელებში */}
+      {!isDashboardPage && (
         <Navbar 
           lang={lang} setLang={setLang} t={t.navbar} 
           isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}
@@ -82,13 +83,16 @@ const App = () => {
           {/* ================= 🚀 დისტრიბუციის პანელი ================= */}
           <Route path="/admin" element={<DistributionDashboard />} />
 
+          {/* ================= 🚀 კურიერის პანელი ================= */}
+          <Route path="/courier" element={<CourierDashboard />} />
+
           {/* 404 რე-დირექტი */}
           <Route path="*" element={<Hero t={t.hero} setView={(path) => navigate(`/${path}`)} />} />
         </Routes>
       </main>
 
-      {/* ფუტერი დაიმალება, როცა ვართ /admin გვერდზე */}
-      {!isDistributionPage && <Footer t={t.footer} />}
+      {/* ფუტერი დაიმალება, როცა ვართ შიდა პანელებში */}
+      {!isDashboardPage && <Footer t={t.footer} />}
       <Analytics />
     </div>
   );

@@ -47,6 +47,11 @@ export default function DistributionDashboard() {
   const [expandedArchiveWeek, setExpandedArchiveWeek] = useState(null);
   const [expandedArchiveOrder, setExpandedArchiveOrder] = useState(null);
 
+  // კურიერის მონაცემების რედაქტირების State-ები ადმინისთვის
+  const [editingDeliveryOrderId, setEditingDeliveryOrderId] = useState(null);
+  const [adminAmountPaid, setAdminAmountPaid] = useState('');
+  const [adminDeliveryStatus, setAdminDeliveryStatus] = useState('delivered');
+
   // 📦 პროდუქტის ახალი ველები
   const [newProdName, setNewProdName] = useState('');
   const [newProdRetailPrice, setNewProdRetailPrice] = useState('');
@@ -811,6 +816,48 @@ export default function DistributionDashboard() {
     return sum + orderTotal;
   }, 0);
 
+  // 💰 კურიერის მიერ შეგროვებული თანხა და ნისიები მიმდინარე კვირაში
+  const totalWeeklyCollected = history.reduce((sum, o) => sum + (o.amountPaid || 0), 0);
+  const totalWeeklyDebt = history.reduce((sum, o) => sum + (o.amountRemaining || 0), 0);
+
+  // 🚚 კურიერის მონაცემების რედაქტირების შენახვა ადმინის მიერ
+  const handleSaveDeliveryEdits = async (order) => {
+    const paidNum = parseFloat(adminAmountPaid);
+    if (isNaN(paidNum) || paidNum < 0) {
+      return alert("გთხოვთ შეიყვანოთ ვალიდური გადახდილი თანხა!");
+    }
+    if (paidNum > order.totalPrice) {
+      return alert("გადახდილი თანხა არ უნდა აღემატებოდეს შეკვეთის ჯამურ ღირებულებას!");
+    }
+
+    const remaining = Math.max(0, order.totalPrice - paidNum);
+    let paymentStatus = 'paid';
+    if (paidNum === 0) {
+      paymentStatus = 'unpaid';
+    } else if (remaining > 0) {
+      paymentStatus = 'partial';
+    }
+
+    if (adminDeliveryStatus === 'failed') {
+      paymentStatus = 'unpaid';
+    }
+
+    try {
+      await updateDoc(doc(db, "dist_orders", order.id), {
+        courierConfirmed: true,
+        deliveryStatus: adminDeliveryStatus,
+        amountPaid: adminDeliveryStatus === 'failed' ? 0 : paidNum,
+        amountRemaining: adminDeliveryStatus === 'failed' ? order.totalPrice : remaining,
+        paymentStatus: paymentStatus
+      });
+
+      alert("✅ მიწოდების მონაცემები წარმატებით განახლდა ადმინის მიერ!");
+      setEditingDeliveryOrderId(null);
+    } catch (err) {
+      alert("❌ შეცდომა განახლებისას: " + err.message);
+    }
+  };
+
   // 🗑️ 2. რეესტრიდან (Firebase-დან) შეკვეთის სამუდამოდ წაშლის ფუნქცია
   const handleDeleteHistoryItem = async (id) => {
     if (window.confirm("ნამდვილად გსურთ ამ შეკვეთის სამუდამოდ წაშლა რეესტრიდან?")) {
@@ -1319,11 +1366,21 @@ export default function DistributionDashboard() {
 
             {/* 📊 მიმდინარე კვირის ჯამური მოთხოვნა და თანხა */}
             <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex flex-wrap justify-between items-center gap-2 mb-1">
-                <h2 className="text-base font-bold text-slate-900">📊 მიმდინარე კვირის ჯამური მოთხოვნა</h2>
-                <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm">
-                  <span>💰 ჯამური გაყიდვები:</span>
-                  <span className="text-sm text-emerald-600">{totalWeeklyRevenue.toLocaleString('ka-GE')} GEL</span>
+              <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
+                <h2 className="text-base font-bold text-slate-900">📊 მიმდინარე კვირის ფინანსური მონაცემები</h2>
+                <div className="flex flex-wrap gap-2">
+                  <div className="bg-blue-50 border border-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-1 shadow-sm">
+                    <span>💰 გაყიდვები:</span>
+                    <span className="text-xs text-blue-600 font-black">{totalWeeklyRevenue.toLocaleString('ka-GE')} ₾</span>
+                  </div>
+                  <div className="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-1 shadow-sm">
+                    <span>💵 შეგროვებული:</span>
+                    <span className="text-xs text-emerald-600 font-black">{totalWeeklyCollected.toLocaleString('ka-GE')} ₾</span>
+                  </div>
+                  <div className="bg-rose-50 border border-rose-100 text-rose-700 px-3 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-1 shadow-sm">
+                    <span>⚠️ ნისიები:</span>
+                    <span className="text-xs text-rose-600 font-black">{totalWeeklyDebt.toLocaleString('ka-GE')} ₾</span>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1 mt-4">
@@ -1369,7 +1426,22 @@ export default function DistributionDashboard() {
                         <div className="flex justify-between items-center cursor-pointer group" onClick={() => toggleHistoryDetail(h.id)}>
                           <div>
                             <span className="font-black text-slate-800 text-sm group-hover:text-indigo-600 transition-colors">🏪 {h.partner}</span>
-                            <p className="text-[10px] text-gray-500 mt-1">📅 {h.createdAt} ➜ 📦 {h.completedAt}</p>
+                            <div className="flex flex-wrap items-center gap-2 mt-1 text-[10px]">
+                              <span className="text-gray-500">📅 {h.createdAt} ➜ 📦 {h.completedAt}</span>
+                              {h.courierConfirmed ? (
+                                h.deliveryStatus === 'failed' ? (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-red-100 text-red-800">❌ ვერ ჩაბარდა</span>
+                                ) : h.paymentStatus === 'paid' ? (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-emerald-100 text-emerald-800">✅ გადახდილი: {h.amountPaid} ₾</span>
+                                ) : h.paymentStatus === 'partial' ? (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-amber-100 text-amber-800">⚠️ ნაწილობრივი: {h.amountPaid} ₾ (ნისია: {h.amountRemaining} ₾)</span>
+                                ) : (
+                                  <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-slate-100 text-slate-700">💵 ნისია: {h.amountRemaining} ₾</span>
+                                )
+                              ) : (
+                                <span className="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-slate-100 text-slate-400">⏳ კურიერის მოლოდინში</span>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase ${h.status === 'რედაქტირებული' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
@@ -1402,6 +1474,79 @@ export default function DistributionDashboard() {
                               <button onClick={() => closeRSWaybill(h)} disabled={isClosingRS || h.rsClosed} className={`px-3 py-1.5 rounded text-[10px] font-bold transition flex items-center gap-1 ml-2 ${h.rsClosed ? 'bg-purple-100 text-purple-800 border border-purple-300 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50'}`}>
                                   {h.rsClosed ? '🔒 დასრულებულია' : '✅ RS დასრულება'}
                                 </button>
+                            </div>
+
+                            {/* 🚚 კურიერის/მიმწოდებლის დეტალები */}
+                            <div className="bg-slate-50/50 p-4 border-b text-xs space-y-2">
+                              {editingDeliveryOrderId === h.id ? (
+                                <div className="space-y-3">
+                                  <div className="font-bold text-slate-700 mb-1">🚚 მიწოდების კორექტირება (ადმინი)</div>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">მიწოდების სტატუსი</label>
+                                      <select 
+                                        value={adminDeliveryStatus} 
+                                        onChange={e => setAdminDeliveryStatus(e.target.value)} 
+                                        className="p-2 border rounded bg-white w-full font-bold"
+                                      >
+                                        <option value="delivered">✅ ჩაბარდა წარმატებით</option>
+                                        <option value="failed">❌ ვერ ჩაბარდა</option>
+                                      </select>
+                                    </div>
+                                    {adminDeliveryStatus === 'delivered' && (
+                                      <div>
+                                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">გადახდილი თანხა (₾)</label>
+                                        <input 
+                                          type="number" 
+                                          step="0.01" 
+                                          value={adminAmountPaid} 
+                                          onChange={e => setAdminAmountPaid(e.target.value)} 
+                                          className="p-2 border rounded bg-white w-full font-bold text-slate-800" 
+                                        />
+                                        <span className="block text-[9px] text-slate-400 mt-1 font-bold">
+                                          ვალი: <span className="text-red-500">{(h.totalPrice - (parseFloat(adminAmountPaid) || 0)).toFixed(2)} ₾</span>
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button onClick={() => setEditingDeliveryOrderId(null)} className="px-3 py-1.5 rounded bg-slate-200 text-slate-700 font-bold hover:bg-slate-300">გაუქმება</button>
+                                    <button onClick={() => handleSaveDeliveryEdits(h)} className="px-3 py-1.5 rounded bg-emerald-600 text-white font-bold hover:bg-emerald-700">შენახვა ✓</button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                  <div className="space-y-1">
+                                    <span className="font-bold text-slate-500 uppercase text-[9px] tracking-wider block">🚚 მიწოდების სტატუსი</span>
+                                    {h.courierConfirmed ? (
+                                      <div className="flex flex-wrap items-center gap-3">
+                                        {h.deliveryStatus === 'failed' ? (
+                                          <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-800">❌ ვერ ჩაბარდა</span>
+                                        ) : (
+                                          <>
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800">✅ ჩაბარებულია</span>
+                                            <span className="font-medium text-slate-700">💰 გადახდილი: <strong className="text-emerald-600 font-black">{h.amountPaid?.toFixed(2)} ₾</strong></span>
+                                            <span className="font-medium text-slate-700">⚠️ დარჩენილი ვალი (ნისია): <strong className={h.amountRemaining > 0 ? 'text-red-600 font-black' : 'text-slate-500 font-bold'}>{h.amountRemaining?.toFixed(2)} ₾</strong></span>
+                                          </>
+                                        )}
+                                        <span className="text-[10px] text-slate-400">📅 დადასტურდა: {h.courierConfirmedAt}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-slate-400 font-bold italic">⏳ კურიერის მოლოდინში... (გაგზავნილია მიწოდებაზე)</span>
+                                    )}
+                                  </div>
+                                  <button 
+                                    onClick={() => {
+                                      setEditingDeliveryOrderId(h.id);
+                                      setAdminAmountPaid((h.amountPaid !== undefined ? h.amountPaid : h.totalPrice).toString());
+                                      setAdminDeliveryStatus(h.deliveryStatus || 'delivered');
+                                    }}
+                                    className="px-2.5 py-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-100 transition"
+                                  >
+                                    ✏️ კორექტირება
+                                  </button>
+                                </div>
+                              )}
                             </div>
 
                             <table className="w-full text-left text-[11px] sm:text-xs">
@@ -1498,6 +1643,19 @@ export default function DistributionDashboard() {
                                 <div>
                                   <span className="font-bold text-xs text-slate-800">🏪 {order.partner}</span>
                                   <span className="text-[10px] text-gray-400 ml-3">📅 {order.completedAt || order.createdAt}</span>
+                                  {order.courierConfirmed ? (
+                                    order.deliveryStatus === 'failed' ? (
+                                      <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-red-100 text-red-800 uppercase">❌ ვერ ჩაბარდა</span>
+                                    ) : order.paymentStatus === 'paid' ? (
+                                      <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-emerald-100 text-emerald-800 uppercase">✅ გადახდილი</span>
+                                    ) : order.paymentStatus === 'partial' ? (
+                                      <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-800 uppercase">⚠️ ნაწ. ვალი</span>
+                                    ) : (
+                                      <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-slate-100 text-slate-700 uppercase">💵 ნისია</span>
+                                    )
+                                  ) : (
+                                    <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[8px] font-black bg-slate-100 text-slate-400 uppercase">⏳ უცნობია</span>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <span className="text-xs font-mono font-black text-indigo-600">{order.totalPrice.toFixed(2)} ₾</span>
@@ -1507,7 +1665,27 @@ export default function DistributionDashboard() {
 
                               {/* 💊 კონკრეტული შეკვეთის წამლების სია */}
                               {isOrderOpen && (
-                                <div className="p-3 bg-white border-t">
+                                <div className="p-3 bg-white border-t space-y-3">
+                                  {/* 🚚 ჩაბარების საინფორმაციო ბლოკი */}
+                                  <div className="bg-slate-50 p-2.5 rounded-xl border text-[11px] text-slate-500 font-bold space-y-1">
+                                    <span className="text-slate-400 font-black uppercase text-[9px] block">🚚 მიწოდების დეტალები:</span>
+                                    {order.courierConfirmed ? (
+                                      <div className="flex flex-wrap gap-4">
+                                        {order.deliveryStatus === 'failed' ? (
+                                          <span className="text-red-600 font-black">❌ მიწოდება ვერ განხორციელდა (უარი ჩაბარებაზე)</span>
+                                        ) : (
+                                          <>
+                                            <span>✅ ჩაბარდა წარმატებით</span>
+                                            <span>💵 გადახდილი: <strong className="text-emerald-600 font-black">{order.amountPaid?.toFixed(2)} ₾</strong></span>
+                                            <span>⚠️ დარჩენილი ვალი (ნისია): <strong className={order.amountRemaining > 0 ? 'text-red-600 font-black' : 'text-slate-500 font-bold'}>{order.amountRemaining?.toFixed(2)} ₾</strong></span>
+                                          </>
+                                        )}
+                                        <span>📅 დადასტურების თარიღი: {order.courierConfirmedAt}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-slate-400 italic">⏳ კურიერის ინფორმაცია არ ფიქსირდება</span>
+                                    )}
+                                  </div>
                                   <table className="w-full text-left text-[11px]">
                                     <thead className="bg-slate-50 text-slate-500 font-bold border-b">
                                       <tr>
