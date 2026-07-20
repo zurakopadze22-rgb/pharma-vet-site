@@ -272,7 +272,7 @@ export default function CourierDashboard() {
                 placeholder="მოძებნე კლიენტი, მისამართი ან საიდენტ. კოდი..." 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
-                className="w-full text-xs font-bold text-slate-800 bg-transparent border-none outline-none placeholder-slate-400"
+                className="w-full text-[16px] sm:text-xs font-bold text-slate-800 bg-transparent border-none outline-none placeholder-slate-400"
               />
               {searchQuery && (
                 <button 
@@ -404,7 +404,7 @@ export default function CourierDashboard() {
                                 placeholder="მაგ: 150.00" 
                                 value={amountPaid} 
                                 onChange={(e) => setAmountPaid(e.target.value)}
-                                className="w-full p-2.5 bg-white border rounded-xl text-sm font-black text-slate-800 outline-none focus:ring-2 focus:ring-teal-500" 
+                                className="w-full p-2.5 bg-white border rounded-xl text-[16px] sm:text-sm font-black text-slate-800 outline-none focus:ring-2 focus:ring-teal-500" 
                               />
                               {amountPaid && (
                                 <span className="block text-[10px] text-slate-400 mt-1 font-bold">
@@ -526,7 +526,7 @@ export default function CourierDashboard() {
                                   placeholder="მაგ: 50.00" 
                                   value={debtPaymentAmount} 
                                   onChange={(e) => setDebtPaymentAmount(e.target.value)}
-                                  className="w-full p-2.5 bg-white border rounded-xl text-sm font-black text-slate-800 outline-none focus:ring-2 focus:ring-rose-500" 
+                                  className="w-full p-2.5 bg-white border rounded-xl text-[16px] sm:text-sm font-black text-slate-800 outline-none focus:ring-2 focus:ring-rose-500" 
                                 />
                                 {debtPaymentAmount && (
                                   <span className="block text-[10px] text-slate-400 mt-1 font-bold">
