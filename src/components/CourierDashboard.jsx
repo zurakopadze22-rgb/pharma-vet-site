@@ -54,7 +54,7 @@ export default function CourierDashboard() {
     if (String(authCode).trim() === COURIER_CODE) {
       setIsAuthenticated(true);
     } else {
-      alert('არასწორი კოდი!');
+      alert(`არასწორი კოდი!\nშეყვანილია: "${String(authCode).trim()}"\nბაზაშია: "${COURIER_CODE}"`);
     }
   };
 
