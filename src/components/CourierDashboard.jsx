@@ -226,9 +226,9 @@ export default function CourierDashboard() {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-slate-50 min-h-screen font-sans text-slate-800 max-w-4xl mx-auto space-y-6">
+    <div className="p-3 sm:p-6 bg-slate-50 min-h-screen font-sans text-slate-800 max-w-4xl mx-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-slate-100 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100 gap-4">
         <div>
           <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">🚚 მიმწოდებლის პანელი</h1>
           <p className="text-teal-600 text-xs mt-0.5 font-bold">🟢 ონლაინ რეჟიმი</p>
