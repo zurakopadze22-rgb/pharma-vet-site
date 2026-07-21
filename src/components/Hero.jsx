@@ -5,18 +5,18 @@ import { useSEO } from '../hooks/useSEO';
 const Hero = ({ t, lang, setView }) => {
   const seoInfo = {
     GE: {
-      title: "Pharma Vet • ვეტერინარული პრეპარატები & პროფესიონალური ბლოგი • Veterinary Care",
-      description: "Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი და დისტრიბუცია. პროფესიონალური რჩევები ცხოველების მოვლის, კვებისა და ჯანმრთელობის შესახებ. Veterinary pharmaceuticals and expert blog.",
+      title: "Pharma Vet • ვეტერინარული პრეპარატები & ბლოგი",
+      description: "Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი, დისტრიბუცია და პროფესიონალური რჩევები ცხოველების მოვლასა და ჯანმრთელობაზე.",
       keywords: "ვეტერინარული პრეპარატები, ცხოველების წამლები, რჩევები ცხოველებზე, ვეტერინარული ბლოგი, ძაღლის კვება, კატის ვიტამინები, ვეტერინარია საქართველო, ფარმავეტი, ფუტკრის მოვლა, მეცხოველეობა, pharmavet.ge"
     },
     EN: {
-      title: "Pharma Vet • Veterinary Pharmaceuticals & Expert Blog",
-      description: "Pharma Vet Georgia - Import and distribution of veterinary pharmaceuticals. Professional advice on animal care, nutrition, and health.",
+      title: "Pharma Vet • Veterinary Medicine & Blog",
+      description: "Pharma Vet Georgia - Import and distribution of high-quality veterinary pharmaceuticals and professional animal health advice.",
       keywords: "veterinary medicine, veterinary blog, animal care tips, animal health, pet nutrition, animal care, animal treatment, veterinary drugs, pharmavet"
     },
     RU: {
-      title: "Pharma Vet • Ветеринарные препараты и экспертный блог",
-      description: "Pharma Vet Georgia - Импорт и дистрибуция ветеринарных препаратов. Профессиональные советы по уходу за животными, питанию и здоровью.",
+      title: "Pharma Vet • Ветеринарные препараты и блог",
+      description: "Pharma Vet Georgia - Импорт и дистрибуция ветеринарных препаратов, профессиональные советы по уходу и здоровью животных.",
       keywords: "ветеринарные препараты, лекарства для животных, ветеринарный блог, ветеринария, витамины для собак, уход за животными, фармавет"
     }
   };
@@ -101,7 +101,7 @@ const Hero = ({ t, lang, setView }) => {
 
         <div className="relative z-20 h-full flex items-center px-8 sm:px-16 md:px-24">
           <div className="max-w-xl">
-            {/* სათაური - საგრძნობლად შემცირებული: LG-ზე 5xl */}
+            {/* სათაური */}
             <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-3 leading-[1.1] tracking-tighter uppercase">
               {t.title.split(' ')[0]}{" "}
               <span className="text-teal-400">
@@ -109,12 +109,12 @@ const Hero = ({ t, lang, setView }) => {
               </span>
             </h1>
             
-            {/* აღწერა - ულტრა-კომპაქტური: MD-ზე Base ზომა */}
+            {/* აღწერა */}
             <p className="text-slate-200 text-[11px] sm:text-[13px] md:text-base mb-5 sm:mb-6 max-w-md font-medium leading-relaxed border-l-[3px] border-teal-500 pl-4 opacity-80 italic">
               {t.desc}
             </p>
 
-            {/* ღილაკი - უფრო პატარა და მინიმალისტური */}
+            {/* ღილაკი */}
             <button
               onClick={() => setView('products')}
               className="group bg-teal-500 text-white px-6 py-2 sm:py-2.5 rounded-lg font-black text-[8px] sm:text-[9px] uppercase tracking-[0.25em] hover:bg-white hover:text-slate-950 transition-all flex items-center gap-2 active:scale-95 shadow-md"
@@ -123,7 +123,7 @@ const Hero = ({ t, lang, setView }) => {
             </button>
           </div>
 
-          {/* ჰორიზონტალური ინდიკატორები - უფრო ნაზი ხაზები */}
+          {/* ჰორიზონტალური ინდიკატორები */}
           <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-row gap-2 z-30">
             {slides.map((_, idx) => (
               <button
