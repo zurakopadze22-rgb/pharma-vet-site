@@ -154,7 +154,14 @@ const Partners = ({ lang, t, onPartnerClick }) => {
                 className="group relative cursor-pointer bg-slate-50 border-2 border-teal-100/50 rounded-[1.5rem] overflow-hidden hover:border-teal-500 hover:shadow-2xl transition-all duration-300 flex flex-col h-full"
               >
                 <div className="h-40 overflow-hidden relative">
-                  <img src={partner.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                  <img 
+                    src={partner.image} 
+                    alt={`${partner.name[lang] || partner.name.GE} - Pharma Vet-ის პარტნიორი ვეტ-აფთიაქი / კლინიკა`} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-700" 
+                    width="300"
+                    height="160"
+                    loading="lazy"
+                  />
                   <div className="absolute top-3 right-3 bg-teal-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black uppercase shadow-md">
                     {partner.workHours}
                   </div>

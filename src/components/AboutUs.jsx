@@ -55,8 +55,11 @@ const AboutUs = ({ t, lang }) => {
       <section className="relative h-[300px] flex items-center justify-center overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070" 
-          alt="About Background" 
+          alt="Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი და დისტრიბუცია" 
           className="absolute inset-0 w-full h-full object-cover opacity-20" 
+          width="1200"
+          height="300"
+          loading="lazy"
         />
         <div className="relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-950">

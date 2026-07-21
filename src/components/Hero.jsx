@@ -5,18 +5,18 @@ import { useSEO } from '../hooks/useSEO';
 const Hero = ({ t, lang, setView }) => {
   const seoInfo = {
     GE: {
-      title: "Pharma Vet • ვეტერინარული პრეპარატები & ბლოგი",
-      description: "Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი, დისტრიბუცია და პროფესიონალური რჩევები ცხოველების მოვლასა და ჯანმრთელობაზე.",
-      keywords: "ვეტერინარული პრეპარატები, ცხოველების წამლები, რჩევები ცხოველებზე, ვეტერინარული ბლოგი, ძაღლის კვება, კატის ვიტამინები, ვეტერინარია საქართველო, ფარმავეტი, ფუტკრის მოვლა, მეცხოველეობა, pharmavet.ge"
+      title: "Pharma Vet • ვეტერინარული პრეპარატები, წამლები & ბლოგი",
+      description: "Pharma Vet Georgia - ვეტერინარული პრეპარატების იმპორტი, დისტრიბუცია, პერორალური ხსნარი და პროფესიონალური რჩევები ცხოველთა მოვლაზე.",
+      keywords: "ვეტერინარული პრეპარატები, ცხოველების წამლები, რჩევები ცხოველებზე, ვეტერინარული ბლოგი, ძაღლის კვება, კატის ვიტამინები, ხსნარი, პერორალური, ვეტერინარია საქართველო, ფარმავეტი, ფუტკრის მოვლა, მეცხოველეობა, pharmavet.ge"
     },
     EN: {
       title: "Pharma Vet • Veterinary Medicine & Blog",
-      description: "Pharma Vet Georgia - Import and distribution of high-quality veterinary pharmaceuticals and professional animal health advice.",
+      description: "Pharma Vet Georgia - Import and distribution of high-quality veterinary pharmaceuticals, oral solutions, and professional animal health advice.",
       keywords: "veterinary medicine, veterinary blog, animal care tips, animal health, pet nutrition, animal care, animal treatment, veterinary drugs, pharmavet"
     },
     RU: {
       title: "Pharma Vet • Ветеринарные препараты и блог",
-      description: "Pharma Vet Georgia - Импорт и дистрибуция ветеринарных препаратов, профессиональные советы по уходу и здоровью животных.",
+      description: "Pharma Vet Georgia - Импорт и дистрибуция ветеринарных препаратов, оральные растворы и профессиональные советы по уходу за животными.",
       keywords: "ветеринарные препараты, лекарства для животных, ветеринарный блог, ветеринария, витамины для собак, уход за животными, фармавет"
     }
   };
@@ -92,7 +92,15 @@ const Hero = ({ t, lang, setView }) => {
               index === currentSlide ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
             }`}
           >
-            <img src={img} alt="" className="w-full h-full object-cover" />
+            <img 
+              src={img} 
+              alt={`Pharma Vet ვეტერინარული პრეპარატები და მოვლა - სლაიდი ${index + 1}`} 
+              className="w-full h-full object-cover" 
+              width="1200"
+              height="380"
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
           </div>
         ))}
 

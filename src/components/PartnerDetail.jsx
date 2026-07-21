@@ -81,7 +81,14 @@ const PartnerDetail = ({ partner, lang, onBack, t }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
         {/* სურათის ბლოკი სქელი კანტით */}
         <div className="relative border-[6px] border-teal-100 rounded-[3.5rem] overflow-hidden shadow-2xl">
-          <img src={partner.image} className="w-full aspect-square object-cover" alt="" />
+          <img 
+            src={partner.image} 
+            className="w-full aspect-square object-cover" 
+            alt={`${partner.name[lang] || partner.name.GE} - Pharma Vet-ის პარტნიორი ვეტ-აფთიაქი`} 
+            width="500"
+            height="500"
+            loading="lazy"
+          />
           <div className="absolute top-6 right-6 bg-teal-500 text-white px-4 py-1.5 rounded-2xl font-black text-[10px] uppercase shadow-lg">
             {partner.workHours}
           </div>

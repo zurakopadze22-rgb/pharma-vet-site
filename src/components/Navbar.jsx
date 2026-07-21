@@ -15,7 +15,13 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, on
           
           {/* Logo Section */}
           <div className="flex items-center gap-3 md:gap-6 cursor-pointer group" onClick={() => handleNavClick('home')}>
-            <img src="/logo.webp" alt="Logo" className="h-14 md:h-20 object-contain bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100/50" />
+            <img 
+              src="/logo.webp" 
+              alt="Pharma Vet Georgia - ვეტერინარული პრეპარატების ოფიციალური ლოგო" 
+              className="h-14 md:h-20 object-contain bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100/50" 
+              width="160"
+              height="60"
+            />
             
             <div className="flex flex-col border-l border-slate-200 pl-3 md:pl-6 text-[10px] md:text-base">
               <span className="font-black text-slate-950 uppercase tracking-tighter leading-none">
@@ -101,7 +107,7 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, on
             <button onClick={() => handleNavClick('products')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'products' ? 'text-teal-600' : 'text-slate-950'}`}>{t.products}</button>
             <button onClick={() => handleNavClick('partners')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'partners' ? 'text-teal-600' : 'text-slate-950'}`}>{t.partners}</button>
             <button onClick={() => handleNavClick('blog')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'blog' ? 'text-teal-600' : 'text-slate-950'}`}>{t.blog}</button>
-            <button onClick={() => handleNavClick('about')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'about' ? 'text-teal-600' : 'text-slate-950'}`}>{t.about}</button>
+            <button onClick={() => handleNavClick('about')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'about' ? 'text-slate-950' : 'text-slate-950'}`}>{t.about}</button>
           </div>
           
           <button 

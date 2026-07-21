@@ -8,7 +8,7 @@ const Shop = ({ t, lang, onProductClick, products }) => {
   const filteredProducts = (activeTab === 'all' 
     ? safeProducts 
     : safeProducts.filter(p => p.category === activeTab)
-  ).slice(0, 12); // რაოდენობა ოდნავ შევამცირეთ უკეთესი ვიზუალისთვის
+  ).slice(0, 12);
 
   return (
     <section id="shop" className="py-10 bg-white overflow-hidden">
@@ -19,11 +19,18 @@ const Shop = ({ t, lang, onProductClick, products }) => {
             {t.title}
           </h2>
           
-          {/* კატეგორიების ბარათები - მობილურზე კომპაქტური (3 სვეტი) */}
+          {/* კატეგორიების ბარათები */}
           <div className="grid grid-cols-3 gap-2 md:gap-6 max-w-5xl mx-auto mb-12">
             <div onClick={() => setActiveTab(activeTab === 'nutrition' ? 'all' : 'nutrition')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'nutrition' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
-              <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=800" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img 
+                src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=800" 
+                alt="ცხოველთა კვება და დანამატები - Pharma Vet" 
+                className="absolute inset-0 w-full h-full object-cover" 
+                width="400"
+                height="200"
+                loading="lazy"
+              />
               <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/20 transition-colors"></div>
               <div className="absolute inset-0 flex items-center justify-center font-black text-white uppercase tracking-tighter md:tracking-widest text-[10px] sm:text-sm md:text-base text-center px-1">
                 {t.nutrition}
@@ -32,7 +39,14 @@ const Shop = ({ t, lang, onProductClick, products }) => {
 
             <div onClick={() => setActiveTab(activeTab === 'pharma' ? 'all' : 'pharma')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'pharma' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
-              <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img 
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800" 
+                alt="ვეტერინარული პრეპარატები და მედიკამენტები - Pharma Vet" 
+                className="absolute inset-0 w-full h-full object-cover" 
+                width="400"
+                height="200"
+                loading="lazy"
+              />
               <div className="absolute inset-0 bg-slate-950/40"></div>
               <div className="absolute inset-0 flex items-center justify-center font-black text-white uppercase tracking-tighter md:tracking-widest text-[10px] sm:text-sm md:text-base text-center px-1">
                 {t.pharma}
@@ -41,7 +55,14 @@ const Shop = ({ t, lang, onProductClick, products }) => {
 
             <div onClick={() => setActiveTab(activeTab === 'care' ? 'all' : 'care')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'care' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
-              <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img 
+                src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800" 
+                alt="ცხოველთა მოვლა და ჰიგიენა - Pharma Vet" 
+                className="absolute inset-0 w-full h-full object-cover" 
+                width="400"
+                height="200"
+                loading="lazy"
+              />
               <div className="absolute inset-0 bg-slate-950/40"></div>
               <div className="absolute inset-0 flex items-center justify-center font-black text-white uppercase tracking-tighter md:tracking-widest text-[10px] sm:text-sm md:text-base text-center px-1">
                 {lang === 'GE' ? 'მოვლა' : 'Care'}
@@ -50,7 +71,7 @@ const Shop = ({ t, lang, onProductClick, products }) => {
           </div>
         </div>
 
-        {/* პროდუქტების ბადე - დესკტოპზე უფრო დიდი ბარათები (4 სვეტი მაქსიმუმ) */}
+        {/* პროდუქტების ბადე */}
         <div className="flex flex-wrap justify-center gap-4 md:gap-8">
           {filteredProducts.map(product => (
             <div 
@@ -66,8 +87,11 @@ const Shop = ({ t, lang, onProductClick, products }) => {
               <div className="aspect-square overflow-hidden bg-white relative flex items-center justify-center p-6">
                 <img 
                   src={product.image} 
-                  alt={product.name[lang]} 
+                  alt={`${product.name[lang] || product.name.GE} - ვეტერინარული პრეპარატი ${product.manufacturer}`} 
                   className="w-full h-full object-contain group-hover:scale-110 transition duration-700" 
+                  width="300"
+                  height="300"
+                  loading="lazy"
                 />
               </div>
               
