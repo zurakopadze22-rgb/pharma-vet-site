@@ -152,7 +152,15 @@ export default function DistributionDashboard() {
     });
 
     const unsubArchives = onSnapshot(collection(db, "dist_weekly_archives"), (snapshot) => {
-      setWeeklyArchives(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const parsed = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const parseDate = (dStr) => {
+        if (!dStr) return new Date(0);
+        const parts = dStr.split('.');
+        if (parts.length < 3) return new Date(0);
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      };
+      parsed.sort((a, b) => parseDate(b.closedDate) - parseDate(a.closedDate));
+      setWeeklyArchives(parsed);
     });
 
     const qDebts = query(collection(db, "dist_orders"), where("amountRemaining", ">", 0));
