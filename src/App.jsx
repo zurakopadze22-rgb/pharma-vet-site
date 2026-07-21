@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 
+// Context Providers
+import { ToastProvider } from './context/ToastContext';
+
+// Modals
+import SpotlightSearch from './components/SpotlightSearch';
+
 // მთავარი საიტის კომპონენტები
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -18,18 +24,36 @@ import BecomePartner from './components/BecomePartner';
 import Blog from './components/Blog';
 import BlogDetail from './components/BlogDetail';
 
-
 // მონაცემები
 import { translations } from './translations';
 import { productsData } from './data/products';
 
-// 🚀 შემოგვაქვს შენი ახალი პანელი, რომელიც ნაბიჯი 1-ში შევქმენით
+// 🚀 შიდა პანელები
 import DistributionDashboard from './components/DistributionDashboard'; 
 import CourierDashboard from './components/CourierDashboard';
 
-const App = () => {
-  const [lang, setLang] = useState('GE'); 
+const AppContent = () => {
+  // Language Persistence in localStorage
+  const [lang, setLangState] = useState(() => {
+    try {
+      return localStorage.getItem('pharmavet_lang') || 'GE';
+    } catch (e) {
+      return 'GE';
+    }
+  });
+
+  const setLang = (newLang) => {
+    setLangState(newLang);
+    try {
+      localStorage.setItem('pharmavet_lang', newLang);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -54,6 +78,7 @@ const App = () => {
         <Navbar 
           lang={lang} setLang={setLang} t={t.navbar} 
           isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}
+          onOpenSearch={() => setIsSearchOpen(true)}
           setView={(path) => navigate(path === 'home' ? '/' : `/${path}`)}
           view={location.pathname === '/' ? 'home' : location.pathname.substring(1).split('/')[0]}
         />
@@ -72,7 +97,15 @@ const App = () => {
           } />
 
           <Route path="/products" element={<ProductCatalog t={t.catalog} lang={lang} allProducts={productsData} onProductClick={handleProductClick} />} />
-          <Route path="/product/:slug" element={<ProductDetail allProducts={productsData} lang={lang} t={t.detail} onProductClick={handleProductClick} onBack={() => navigate('/products')} />} />
+          <Route path="/product/:slug" element={
+            <ProductDetail 
+              allProducts={productsData} 
+              lang={lang} 
+              t={t.detail} 
+              onProductClick={handleProductClick} 
+              onBack={() => navigate('/products')}
+            />
+          } />
           <Route path="/partners" element={<Partners lang={lang} t={t.partners} onPartnerClick={handlePartnerClick} />} />
           <Route path="/partner-detail" element={<PartnerDetail partner={location.state?.partner} lang={lang} t={t.partners} onBack={() => navigate('/partners')} />} />
           <Route path="/become-partner" element={<BecomePartner lang={lang} t={t.becomePartner} />} />
@@ -91,10 +124,21 @@ const App = () => {
         </Routes>
       </main>
 
+      {/* Global Modals */}
+      <SpotlightSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} lang={lang} />
+
       {/* ფუტერი დაიმალება, როცა ვართ შიდა პანელებში */}
       {!isDashboardPage && <Footer t={t.footer} />}
       <Analytics />
     </div>
+  );
+};
+
+const App = () => {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Menu, Globe, X, Handshake, BookOpen } from 'lucide-react';
+import { Menu, Globe, X, Handshake, Search } from 'lucide-react';
 
-const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) => {
+const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, onOpenSearch }) => {
   
   const handleNavClick = (targetView) => {
     setView(targetView);
@@ -40,9 +40,18 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
             <button onClick={() => setView('blog')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'blog' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.blog}
             </button>
- 
+
             <button onClick={() => setView('about')} className={`text-xs md:text-[14px] font-black uppercase tracking-wider transition-colors ${view === 'about' ? 'text-teal-600' : 'text-slate-950 hover:text-teal-600'}`}>
               {t.about}
+            </button>
+
+            {/* 🔍 Spotlight Search Button */}
+            <button
+              onClick={onOpenSearch}
+              title="ძებნა (Cmd+K)"
+              className="p-2 text-slate-700 hover:text-teal-600 transition-colors"
+            >
+              <Search className="w-5 h-5" />
             </button>
             
             <button 
@@ -68,7 +77,13 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={onOpenSearch}
+              className="p-2 text-slate-700 hover:text-teal-600"
+            >
+              <Search className="w-6 h-6" />
+            </button>
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 text-slate-950"
@@ -85,10 +100,7 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen }) 
           <div className="flex flex-col space-y-4">
             <button onClick={() => handleNavClick('products')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'products' ? 'text-teal-600' : 'text-slate-950'}`}>{t.products}</button>
             <button onClick={() => handleNavClick('partners')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'partners' ? 'text-teal-600' : 'text-slate-950'}`}>{t.partners}</button>
-            
-            {/* ბლოგის ღილაკი (Mobile) */}
             <button onClick={() => handleNavClick('blog')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'blog' ? 'text-teal-600' : 'text-slate-950'}`}>{t.blog}</button>
-            
             <button onClick={() => handleNavClick('about')} className={`text-left font-black uppercase tracking-widest text-sm ${view === 'about' ? 'text-teal-600' : 'text-slate-950'}`}>{t.about}</button>
           </div>
           

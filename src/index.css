@@ -1,6 +1,32 @@
 @import "tailwindcss";
 
-/* სურვილისამებრ დაამატე ფონტი უკეთესი ვიზუალისთვის */
 body {
   font-family: 'Inter', sans-serif;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  
+  #printable-instruction, #printable-instruction * {
+    visibility: visible !important;
+  }
+  
+  #printable-instruction {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 32px !important;
+    background: white !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.pharmavet.ge/</loc>
     <lastmod>2026-07-21</lastmod>
@@ -41,311 +42,539 @@
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vmnpharma.com/wp-content/uploads/2022/08/vn-ad3-eck.jpg</image:loc>
+      <image:title>VN-AD3ECK ხსნარი პერორალური მიღებისთვის</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/phosdcal-vn-oral-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vmnpharma.com/wp-content/uploads/2022/08/phosdcal-vn.jpg</image:loc>
+      <image:title>PHOSDCAL-VN ხსნარი პერორალური მიღებისთვის</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/minacid-vn-oral-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vmnpharma.com/wp-content/uploads/2022/08/minacid-vn-20-kg.jpg</image:loc>
+      <image:title>MINACID-VN ხსნარი პერორალური მიღებისთვის</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/aminovit-oral-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/aminovit.jpg</image:loc>
+      <image:title>AMINOVIT პერორალური ხსნარი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/doxyflo-vm-oral-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/doxyflo.jpg</image:loc>
+      <image:title>DOXYFLO VM პერორალური ხსნარი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/phytores-vn-oral-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/phytores.jpg</image:loc>
+      <image:title>Phytores-VN პერორალური ხსნარი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/move-g-joint-support</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/move.jpg</image:loc>
+      <image:title>MOVE+G სახსრების მხარდაჭერა</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/anti-hairball-malt-paste</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/anti-hairball.jpg</image:loc>
+      <image:title>თმის ბურთულების საწინააღმდეგო ალაოს პასტა</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/calming-paste-cats-dogs</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/calming.jpg</image:loc>
+      <image:title>დამამშვიდებელი პასტა კატებისა და ძაღლებისთვის</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/tylogenta-plus-injectable-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/tylogenta_plus.jpg</image:loc>
+      <image:title>TYLOGENTA PLUS საინექციო ხსნარი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/ciprofloxacin-20-solution</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/ciprofloxacin_20.webp</image:loc>
+      <image:title>CIPROFLOXACIN 20% ხსნარი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/product/vita-b-liver-yeast-extract</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/vita_b_liver.jpeg</image:loc>
+      <image:title>VITA-B LIVER + საფუარის ექსტრაქტი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/calves-diarrhea-prevention-treatment</loc>
     <lastmod>2026-01-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/1.webp</image:loc>
+      <image:title>ხბოს ფაღარათი: პრევენცია და მკურნალობა</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/vitamins-role-dog-immunity</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/2.webp</image:loc>
+      <image:title>ვიტამინების როლი ძაღლების იმუნიტეტში</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/mastitis-prevention-dairy-cattle</loc>
     <lastmod>2026-01-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/3.webp</image:loc>
+      <image:title>მასტიტის პრევენცია მეწველ საქონელში</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/cat-kidney-disease-symptoms</loc>
     <lastmod>2026-01-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/4.webp</image:loc>
+      <image:title>კატის თირკმლის დაავადებები: სიმპტომები</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/coccidiosis-poultry-control</loc>
     <lastmod>2026-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/5.webp</image:loc>
+      <image:title>კოკციდიოზი ფრინველში და კონტროლი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/cattle-vaccination-schedule</loc>
     <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/6.webp</image:loc>
+      <image:title>მსხვილფეხა რქოსანი პირუტყვის ვაქცინაცია</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/tick-protection-methods-dogs</loc>
     <lastmod>2026-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/7.webp</image:loc>
+      <image:title>ტკიპებისგან დაცვის თანამედროვე მეთოდები</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/sheep-footrot-treatment</loc>
     <lastmod>2026-01-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/8.webp</image:loc>
+      <image:title>ჩლიქის დამპალი ცხვარში: როგორ ვუმკურნალოთ</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/african-swine-fever-biosafety</loc>
     <lastmod>2026-01-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/9.webp</image:loc>
+      <image:title>ღორის აფრიკული ჭირი და ბიოუსაფრთხოება</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/puppy-care-first-100-days</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/10.webp</image:loc>
+      <image:title>ლეკვის მოვლა: პირველი 100 დღე</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/bloat-cattle-nutritional-errors</loc>
     <lastmod>2026-02-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/11.webp</image:loc>
+      <image:title>ტიმპანია (გაბერვა) პირუტყვში: კვების შეცდომები</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/senior-dog-care-arthritis-joints</loc>
     <lastmod>2026-02-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/12.webp</image:loc>
+      <image:title>ხანდაზმული ძაღლების მოვლა: ართრიტი და სახსრები</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/increasing-milk-yield-nutrition</loc>
     <lastmod>2026-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/13.webp</image:loc>
+      <image:title>რძის პროდუქტიულობის გაზრდა სწორი კვებით</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/cat-obesity-health-risks</loc>
     <lastmod>2026-02-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/14.webp</image:loc>
+      <image:title>კატის სიმსუქნე: რატომ არის ის საშიში?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/ketosis-dairy-cows-symptoms</loc>
     <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/15.webp</image:loc>
+      <image:title>კეტოზი მეწველ საქონელში: სიმპტომები და პრევენცია</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/toxic-foods-for-dogs</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/16.webp</image:loc>
+      <image:title>საკვები პროდუქტები, რომლებიც ტოქსიკურია ძაღლებისთვის</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/worm-infestation-sheep-deworming</loc>
     <lastmod>2026-02-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/17.webp</image:loc>
+      <image:title>ჭიებით ინვაზია მეცხვარეობაში: სტრატეგიული დეჰელმინთიზაცია</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/hairballs-in-cats-prevention</loc>
     <lastmod>2026-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/18.webp</image:loc>
+      <image:title>ბეწვის გორგლები (Hairballs) კატებში</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/biosecurity-poultry-farms</loc>
     <lastmod>2026-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/19.webp</image:loc>
+      <image:title>ბიოუსაფრთხოება ფრინველის ფერმაში</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/ear-infections-otitis-in-dogs</loc>
     <lastmod>2026-03-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/20.webp</image:loc>
+      <image:title>ყურის ინფექციები (ოტიტი) ძაღლებში</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/why-dogs-scratch-ears</loc>
     <lastmod>2026-03-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/21.webp</image:loc>
+      <image:title>რატომ იფხანენ ძაღლები ყურებს?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/importance-of-salt-for-livestock</loc>
     <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/22.webp</image:loc>
+      <image:title>მარილი ფერმაში: რატომ სჭირდებათ ის ცხოველებს?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/why-cat-isnt-drinking-water</loc>
     <lastmod>2026-03-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/23.webp</image:loc>
+      <image:title>რატომ არ სვამს ჩემი კატა წყალს?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/sheep-shearing-health-benefits</loc>
     <lastmod>2026-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/24.webp</image:loc>
+      <image:title>ცხვრის პარსვა: რატომ არის ეს აუცილებელი?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/can-dogs-eat-bones-safety</loc>
     <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/25.webp</image:loc>
+      <image:title>შეიძლება თუ არა ძაღლისთვის ძვლების მიცემა?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/why-chickens-stop-laying-eggs</loc>
     <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/26.webp</image:loc>
+      <image:title>რატომ არ დებს ქათამი კვერცხს?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/dog-dental-care-guide</loc>
     <lastmod>2026-03-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/27.webp</image:loc>
+      <image:title>უნდა გამოვუწმინდოთ თუ არა კბილები ძაღლს?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/calf-nutrition-first-days</loc>
     <lastmod>2026-03-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/28.webp</image:loc>
+      <image:title>რა ჭამონ ხბოებმა პირველ დღეებში?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/why-cats-hate-bathing</loc>
     <lastmod>2026-03-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/29.webp</image:loc>
+      <image:title>რატომ არ უყვართ კატებს ბანაობა?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/goat-care-and-health-tips</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/30.webp</image:loc>
+      <image:title>თხების მოვლა: მხიარული და ჯანმრთელი ცხოველი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/gumboro-disease-poultry-prevention</loc>
     <lastmod>2026-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/31.webp</image:loc>
+      <image:title>ფრინველის ინფექციური დაავადებები: გუმბორო და მისი პრევენცია</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/beekeeping-varroa-mite-control</loc>
     <lastmod>2026-04-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/32.webp</image:loc>
+      <image:title>ფუტკრის მოვლა: ვაროატოზთან ბრძოლა მარტივი მეთოდებით</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/rabbit-feeding-bloating-prevention</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/33.webp</image:loc>
+      <image:title>ბოცვრების კვება: როგორ ავიცილოთ თავიდან მუცლის შებერილობა</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/horse-hoof-care-guide</loc>
     <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/34.webp</image:loc>
+      <image:title>ცხენის ჩლიქების მოვლა: 'არ არის ჩლიქი - არ არის ცხენი'</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/piglet-iron-injection-care</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/35.webp</image:loc>
+      <image:title>გოჭების მოვლა პირველ დღეებში: რკინის ინექცია</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/puppy-socialization-importance</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/36.webp</image:loc>
+      <image:title>ძაღლის სოციალიზაცია: რატომ არის ეს მნიშვნელოვანი?</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/feline-urinary-stone-disease-diet</loc>
     <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/37.webp</image:loc>
+      <image:title>კატის შარდკენჭოვანი დაავადება: კვების როლი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/pasture-rotation-livestock-health</loc>
     <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/38.webp</image:loc>
+      <image:title>საძოვრების როტაცია: როგორ დავიცვათ მიწა და ცხოველი</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.pharmavet.ge/blog/fish-farming-pond-oxygen-levels</loc>
     <lastmod>2026-05-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/39.webp</image:loc>
+      <image:title>თევზების მოშენება: ჟანგბადის მნიშვნელობა ტბორში</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://www.pharmavet.ge/blog/calving-assistance-farmer-tips</loc>
-    <lastmod>2026-05-15</lastmod>
+    <loc>https://www.pharmavet.ge/blog/chick-rearing-medication-schedule-guide</loc>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/31.webp</image:loc>
+      <image:title>წიწილების გამოზრდის სრული გაიდი: რა პრეპარატები და ვიტამინები მივცეთ დღეების მიხედვით?</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.pharmavet.ge/blog/mastitis-treatment-prevention-cattle</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/3.webp</image:loc>
+      <image:title>მასტიტის მკურნალობა და პრევენცია მსხვილფეხა პირუტყვში: ეფექტური ვეტერინარული პრეპარატები</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.pharmavet.ge/blog/veterinary-farmer-faq-guide</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://www.pharmavet.ge/images/1.webp</image:loc>
+      <image:title>ხშირად დასმული კითხვები ვეტერინარიაში (FAQ): პრეპარატები, დოზირება და მკურნალობა</image:title>
+    </image:image>
   </url>
 </urlset>
