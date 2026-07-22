@@ -1,0 +1,21 @@
+# Pharma Vet Georgia - Veterinary Pharmaceuticals & Care
+
+> Official importer and distributor of high-quality veterinary medicines, vitamins, supplements, and oral solutions in Georgia.
+
+## Core Products & Services
+- Veterinary Pharmaceuticals (Antibiotics, Antiparasitics, Oral Solutions, Injections)
+- Livestock Health & Nutrition (Cattle, Swine, Sheep, Poultry)
+- Bee Care & Veterinary Supplements
+- Educational Veterinary Blog & Clinical Advice
+
+## Official Links
+- Website: https://www.pharmavet.ge/
+- Products Catalog: https://www.pharmavet.ge/products
+- Veterinary Blog: https://www.pharmavet.ge/blog
+- Partners & Distribution: https://www.pharmavet.ge/partners
+- Become a Partner: https://www.pharmavet.ge/become-partner
+
+## Organization Details
+- Entity: Pharma Vet Georgia
+- Location: Georgia (GE)
+- Languages Supported: Georgian (ka), English (en), Russian (ru)
