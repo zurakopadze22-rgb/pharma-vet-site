@@ -12,8 +12,8 @@ const Footer = ({ t }) => {
           height="80"
           loading="lazy"
         />
-        <p className="text-slate-400 font-bold mb-10 max-w-xl mx-auto">{t.text}</p>
-        <p className="text-[10px] text-slate-300 font-black uppercase tracking-widest">{t.rights}</p>
+        <p className="text-slate-600 font-bold mb-10 max-w-xl mx-auto">{t.text}</p>
+        <p className="text-[11px] text-slate-500 font-black uppercase tracking-widest">{t.rights}</p>
       </div>
     </footer>
   );

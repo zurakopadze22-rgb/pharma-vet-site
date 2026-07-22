@@ -45,9 +45,9 @@ const TrustSection = ({ t, lang }) => {
                 <div className="w-16 h-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-teal-500 group-hover:text-white transition-all duration-500 shadow-sm">
                   {f.icon}
                 </div>
-                <h4 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tighter italic">
+                <h3 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tighter italic">
                   {f.title}
-                </h4>
+                </h3>
                 <p className="text-slate-500 text-sm font-bold leading-relaxed italic">
                   {f.desc}
                 </p>

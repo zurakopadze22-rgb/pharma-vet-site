@@ -101,9 +101,9 @@ const Shop = ({ t, lang, onProductClick, products }) => {
                   {product.manufacturer}
                 </span>
                 
-                <h4 className="text-sm md:text-lg font-black text-slate-900 mb-4 leading-tight group-hover:text-teal-800 transition-colors line-clamp-2 min-h-[2.5rem] md:min-h-[3.5rem] uppercase tracking-tighter">
+                <h3 className="text-sm md:text-lg font-black text-slate-900 mb-4 leading-tight group-hover:text-teal-800 transition-colors line-clamp-2 min-h-[2.5rem] md:min-h-[3.5rem] uppercase tracking-tighter">
                   {product.name[lang]}
-                </h4>
+                </h3>
                 
                 <div className="mt-auto pt-4 border-t border-teal-200/50 flex items-center justify-between">
                   <span className="text-base md:text-xl font-black text-slate-950">
