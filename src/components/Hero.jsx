@@ -67,10 +67,10 @@ const Hero = ({ t, lang, setView }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1200",
-    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200",
-    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200",
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=1200"
+    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=70&auto=format&fit=crop&w=1000",
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=70&auto=format&fit=crop&w=1000",
+    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=70&auto=format&fit=crop&w=1000",
+    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=70&auto=format&fit=crop&w=1000"
   ];
 
   useEffect(() => {
@@ -96,9 +96,10 @@ const Hero = ({ t, lang, setView }) => {
               src={img} 
               alt={`Pharma Vet ვეტერინარული პრეპარატები და მოვლა - სლაიდი ${index + 1}`} 
               className="w-full h-full object-cover" 
-              width="1200"
+              width="1000"
               height="380"
               loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "auto"}
               decoding="async"
             />
           </div>

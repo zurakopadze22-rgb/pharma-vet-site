@@ -24,7 +24,7 @@ const Shop = ({ t, lang, onProductClick, products }) => {
             <div onClick={() => setActiveTab(activeTab === 'nutrition' ? 'all' : 'nutrition')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'nutrition' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
               <img 
-                src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=800" 
+                src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=70&auto=format&fit=crop&w=400" 
                 alt="ცხოველთა კვება და დანამატები - Pharma Vet" 
                 className="absolute inset-0 w-full h-full object-cover" 
                 width="400"
@@ -40,7 +40,7 @@ const Shop = ({ t, lang, onProductClick, products }) => {
             <div onClick={() => setActiveTab(activeTab === 'pharma' ? 'all' : 'pharma')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'pharma' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
               <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800" 
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=70&auto=format&fit=crop&w=400" 
                 alt="ვეტერინარული პრეპარატები და მედიკამენტები - Pharma Vet" 
                 className="absolute inset-0 w-full h-full object-cover" 
                 width="400"
@@ -56,7 +56,7 @@ const Shop = ({ t, lang, onProductClick, products }) => {
             <div onClick={() => setActiveTab(activeTab === 'care' ? 'all' : 'care')} 
                  className={`relative h-20 sm:h-28 md:h-36 rounded-2xl md:rounded-[2.5rem] overflow-hidden cursor-pointer border-2 md:border-4 transition-all duration-300 ${activeTab === 'care' ? 'border-teal-500 shadow-lg scale-[1.05]' : 'border-teal-100 hover:border-teal-300'}`}>
               <img 
-                src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800" 
+                src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=70&auto=format&fit=crop&w=400" 
                 alt="ცხოველთა მოვლა და ჰიგიენა - Pharma Vet" 
                 className="absolute inset-0 w-full h-full object-cover" 
                 width="400"
