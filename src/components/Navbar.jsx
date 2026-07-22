@@ -55,6 +55,7 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, on
             <button
               onClick={onOpenSearch}
               title="ძებნა (Cmd+K)"
+              aria-label="ძებნა"
               className="p-2 text-slate-700 hover:text-teal-800 transition-colors"
             >
               <Search className="w-5 h-5" />
@@ -86,12 +87,14 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, on
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={onOpenSearch}
+              aria-label="ძებნა"
               className="p-2 text-slate-700 hover:text-teal-800"
             >
               <Search className="w-6 h-6" />
             </button>
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="მენიუს გახსნა"
               className="p-2 text-slate-950"
             >
               {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}

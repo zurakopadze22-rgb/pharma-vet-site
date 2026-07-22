@@ -67,10 +67,10 @@ const Hero = ({ t, lang, setView }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2000",
-    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2000",
-    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000",
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=2000"
+    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1200",
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200",
+    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200",
+    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=1200"
   ];
 
   useEffect(() => {
