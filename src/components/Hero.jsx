@@ -126,25 +126,27 @@ const Hero = ({ t, lang, setView }) => {
             {/* ღილაკი */}
             <button
               onClick={() => setView('products')}
-              className="group bg-teal-500 text-white px-6 py-2 sm:py-2.5 rounded-lg font-black text-[8px] sm:text-[9px] uppercase tracking-[0.25em] hover:bg-white hover:text-slate-950 transition-all flex items-center gap-2 active:scale-95 shadow-md"
+              className="group bg-teal-700 text-white px-6 py-2.5 rounded-lg font-black text-[9px] sm:text-[10px] uppercase tracking-[0.25em] hover:bg-white hover:text-slate-950 transition-all flex items-center gap-2 active:scale-95 shadow-md"
             >
               {t.button} <ArrowUpRight className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform" />
             </button>
           </div>
 
-          {/* ჰორიზონტალური ინდიკატორები */}
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-row gap-2 z-30">
+          {/* ჰორიზონტალური ინდიკატორები (Touch target >= 24px) */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-row gap-1 z-30">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`transition-all duration-500 rounded-full outline-none h-1 ${
+                className="p-2.5 flex items-center justify-center outline-none cursor-pointer"
+                aria-label={`Go to slide ${idx + 1}`}
+              >
+                <span className={`transition-all duration-500 rounded-full h-1.5 ${
                   idx === currentSlide 
                     ? 'w-8 bg-teal-400' 
-                    : 'w-3 bg-white/20 hover:bg-white/50'
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
+                    : 'w-3 bg-white/40 hover:bg-white/70'
+                }`} />
+              </button>
             ))}
           </div>
         </div>
