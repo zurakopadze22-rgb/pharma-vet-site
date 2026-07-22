@@ -2,20 +2,17 @@
 
 > Official importer and distributor of high-quality veterinary medicines, vitamins, supplements, and oral solutions in Georgia.
 
+## Main Navigation & Documentation
+
+- [Home Page](https://www.pharmavet.ge/): Official website for Pharma Vet Georgia.
+- [Products Catalog](https://www.pharmavet.ge/products): Complete list of veterinary medicines, oral solutions, antibiotics, and vitamins.
+- [Veterinary Blog](https://www.pharmavet.ge/blog): Educational articles and professional advice for livestock and pet health.
+- [Partners Network](https://www.pharmavet.ge/partners): Network of official partner veterinary pharmacies and clinics across Georgia.
+- [Become a Partner](https://www.pharmavet.ge/become-partner): Application form for wholesale distribution and partnership.
+- [About Us](https://www.pharmavet.ge/about): Company history, mission, and quality standards.
+
 ## Core Products & Services
-- Veterinary Pharmaceuticals (Antibiotics, Antiparasitics, Oral Solutions, Injections)
-- Livestock Health & Nutrition (Cattle, Swine, Sheep, Poultry)
-- Bee Care & Veterinary Supplements
-- Educational Veterinary Blog & Clinical Advice
 
-## Official Links
-- Website: https://www.pharmavet.ge/
-- Products Catalog: https://www.pharmavet.ge/products
-- Veterinary Blog: https://www.pharmavet.ge/blog
-- Partners & Distribution: https://www.pharmavet.ge/partners
-- Become a Partner: https://www.pharmavet.ge/become-partner
-
-## Organization Details
-- Entity: Pharma Vet Georgia
-- Location: Georgia (GE)
-- Languages Supported: Georgian (ka), English (en), Russian (ru)
+- [Antibiotics & Injections](https://www.pharmavet.ge/products): High-efficacy veterinary pharmaceutical solutions.
+- [Oral Solutions](https://www.pharmavet.ge/products): Liquid oral medications for livestock and poultry.
+- [Livestock & Bee Care](https://www.pharmavet.ge/products): Nutritional supplements, vitamins, and bee health products.
