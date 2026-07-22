@@ -18,9 +18,9 @@ const Navbar = ({ setView, view, lang, setLang, t, setIsMenuOpen, isMenuOpen, on
             <img 
               src="/logo.webp" 
               alt="Pharma Vet Georgia - ვეტერინარული პრეპარატების ოფიციალური ლოგო" 
-              className="h-14 md:h-20 object-contain bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100/50" 
-              width="160"
-              height="60"
+              className="h-14 w-14 md:h-20 md:w-20 object-contain aspect-square bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100/50" 
+              width="80"
+              height="80"
             />
             
             <div className="flex flex-col border-l border-slate-200 pl-3 md:pl-6 text-[10px] md:text-base">

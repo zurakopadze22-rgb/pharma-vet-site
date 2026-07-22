@@ -155,7 +155,7 @@ const ProductDetail = ({ lang, allProducts = [], onProductClick, t, onBack }) =>
       <div id="printable-instruction" className="hidden print:block p-8 bg-white text-slate-900 font-sans">
         <div className="flex justify-between items-center border-b-2 border-teal-600 pb-4 mb-6">
           <div className="flex items-center gap-4">
-            <img src="/logo.webp" alt="Pharma Vet" className="h-16 object-contain" />
+            <img src="/logo.webp" alt="Pharma Vet" className="h-16 w-16 object-contain aspect-square" width="64" height="64" />
             <div>
               <h1 className="text-xl font-black uppercase text-slate-900">Pharma Vet Georgia</h1>
               <p className="text-xs font-bold text-teal-600">ვეტერინარული პრეპარატების ოფიციალური დისტრიბუცია</p>

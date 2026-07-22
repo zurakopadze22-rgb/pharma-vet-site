@@ -6,9 +6,9 @@ const Footer = ({ t }) => {
       <div className="max-w-7xl mx-auto px-6 text-center">
         <img 
           src="/logo.webp" 
-          className="h-20 mx-auto mb-8 bg-white p-2 rounded-2xl" 
+          className="h-20 w-20 mx-auto mb-8 bg-white p-2 rounded-2xl object-contain aspect-square" 
           alt="Pharma Vet Georgia - ვეტერინარული დისტრიბუცია და პორტალი" 
-          width="160"
+          width="80"
           height="80"
           loading="lazy"
         />
