@@ -26,13 +26,22 @@ import BlogDetail from './components/BlogDetail';
 
 // მონაცემები
 import { translations } from './translations';
-import { productsData } from './data/products';
+import { getStoredProducts } from './utils/productStore';
 
 // 🚀 შიდა პანელები
 import DistributionDashboard from './components/DistributionDashboard'; 
 import CourierDashboard from './components/CourierDashboard';
 
 const AppContent = () => {
+  // Dynamic Products State from localStorage / initial catalog
+  const [products, setProducts] = useState(() => getStoredProducts());
+
+  useEffect(() => {
+    const handleUpdate = () => setProducts(getStoredProducts());
+    window.addEventListener('pharmavet_products_updated', handleUpdate);
+    return () => window.removeEventListener('pharmavet_products_updated', handleUpdate);
+  }, []);
+
   // Language Persistence in localStorage
   const [lang, setLangState] = useState(() => {
     try {
@@ -90,16 +99,16 @@ const AppContent = () => {
           <Route path="/" element={
             <>
               <Hero t={t.hero} lang={lang} setView={(path) => navigate(`/${path}`)} />
-              <Shop t={t.shop} lang={lang} products={productsData} onProductClick={handleProductClick} />
+              <Shop t={t.shop} lang={lang} products={products} onProductClick={handleProductClick} />
               <TrustSection lang={lang} />
               <BrandsSlider lang={lang} />
             </>
           } />
 
-          <Route path="/products" element={<ProductCatalog t={t.catalog} lang={lang} allProducts={productsData} onProductClick={handleProductClick} />} />
+          <Route path="/products" element={<ProductCatalog t={t.catalog} lang={lang} allProducts={products} onProductClick={handleProductClick} />} />
           <Route path="/product/:slug" element={
             <ProductDetail 
-              allProducts={productsData} 
+              allProducts={products} 
               lang={lang} 
               t={t.detail} 
               onProductClick={handleProductClick} 

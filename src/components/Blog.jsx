@@ -1,9 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Calendar, ArrowRight, BookOpen } from 'lucide-react';
-import { blogArticles } from '../data/blogData';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Calendar, ArrowRight, Video } from 'lucide-react';
+import { getStoredArticles } from '../utils/blogStore';
 import { useSEO } from '../hooks/useSEO';
 
 const Blog = ({ lang, t, onArticleClick }) => {
+  const [articles, setArticles] = useState(getStoredArticles());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setArticles(getStoredArticles());
+    };
+    window.addEventListener('pharmavet_blogs_updated', handleUpdate);
+    return () => window.removeEventListener('pharmavet_blogs_updated', handleUpdate);
+  }, []);
+
   const seoInfo = {
     GE: {
       title: "ვეტერინარული ბლოგი - რჩევები და სტატიები | Pharma Vet",
@@ -70,12 +80,11 @@ const Blog = ({ lang, t, onArticleClick }) => {
   ];
 
   const filteredArticles = useMemo(() => {
-    return blogArticles.filter(article => {
-      const title = article.title[lang] || "";
-      const excerpt = article.excerpt[lang] || "";
+    return articles.filter(article => {
+      const title = article.title?.[lang] || article.title?.GE || "";
+      const excerpt = article.excerpt?.[lang] || article.excerpt?.GE || "";
       
-      // აქ ვიღებთ კატეგორიის ნათარგმნ ვერსიას საძიებო სისტემისთვის
-      const categoryText = categoryTranslations[article.category]?.[lang] || article.category;
+      const categoryText = categoryTranslations[article.category]?.[lang] || article.category || "";
       
       const matchesSearch = 
         title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -85,7 +94,7 @@ const Blog = ({ lang, t, onArticleClick }) => {
       const matchesSpecies = selectedSpecies === "all" || article.species === selectedSpecies;
       return matchesSearch && matchesSpecies;
     });
-  }, [searchQuery, selectedSpecies, lang]);
+  }, [articles, searchQuery, selectedSpecies, lang]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 animate-in fade-in duration-700">
@@ -100,26 +109,29 @@ const Blog = ({ lang, t, onArticleClick }) => {
           </p>
         </div>
 
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        {/* საძიებო ველის ბლოკი */}
+        <div className="relative w-full md:w-72">
           <input 
-            type="text"
-            placeholder={lang === 'GE' ? "ძებნა სტატიებში..." : lang === 'EN' ? "Search articles..." : "Поиск..."}
-            className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:border-teal-500 outline-none transition-all font-bold text-sm shadow-sm"
+            type="text" 
+            placeholder={lang === 'GE' ? "ძებნა ბლოგში..." : lang === 'EN' ? "Search blog..." : "Поиск в блоге..."}
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-slate-50 border-2 border-slate-100 focus:border-teal-500 rounded-2xl py-3 pl-11 pr-4 text-xs font-bold transition-all outline-none"
           />
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-10">
+      {/* ფილტრების ბარი */}
+      <div className="flex flex-wrap gap-2 mb-12">
         {speciesFilters.map((filter) => (
           <button
             key={filter.id}
             onClick={() => setSelectedSpecies(filter.id)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black transition-all ${
               selectedSpecies === filter.id 
-              ? 'bg-teal-500 text-white shadow-lg shadow-teal-200' 
-              : 'bg-white text-slate-400 border-2 border-slate-50 hover:border-teal-100'
+                ? 'bg-teal-600 text-white shadow-lg shadow-teal-100 scale-105' 
+                : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
             }`}
           >
             <span>{filter.icon}</span>
@@ -128,53 +140,64 @@ const Blog = ({ lang, t, onArticleClick }) => {
         ))}
       </div>
 
+      {/* სტატიების ბადე */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredArticles.map((article) => (
-          <article 
-            key={article.slug}
-            onClick={() => onArticleClick(article)}
-            className="group bg-white rounded-[2.5rem] border-2 border-slate-50 overflow-hidden hover:shadow-2xl hover:border-teal-100 transition-all duration-500 flex flex-col cursor-pointer"
-          >
-            <div className="relative aspect-[16/10] overflow-hidden">
-              <img 
-                src={article.image} 
-                alt={article.title[lang]}
-                className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
-              />
-              {/* მრავალენოვანი ბეიჯი სურათზე (იყენებს თარგმნის ფუნქციას) */}
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter text-teal-600 border border-teal-100">
-                {categoryTranslations[article.category]?.[lang] || article.category}
-              </div>
-            </div>
+        {filteredArticles.map((article) => {
+          const isVideoMedia = article.isVideo || article.mediaType === 'video' || (article.video && article.video.length > 0) || (typeof article.image === 'string' && (article.image.endsWith('.mp4') || article.image.endsWith('.webm') || article.image.startsWith('data:video')));
 
-            <div className="p-8 flex flex-col flex-grow">
-              <div className="flex items-center gap-2 text-slate-400 text-[9px] font-black uppercase mb-4">
-                <Calendar className="w-3 h-3" />
-                {article.date}
+          return (
+            <article 
+              key={article.id || article.slug}
+              onClick={() => onArticleClick(article)}
+              className="group bg-white rounded-[2.5rem] border-2 border-slate-50 overflow-hidden hover:shadow-2xl hover:border-teal-100 transition-all duration-500 flex flex-col cursor-pointer"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                {isVideoMedia ? (
+                  <div className="w-full h-full relative flex items-center justify-center bg-slate-950">
+                    <video 
+                      src={article.video || article.image} 
+                      className="w-full h-full object-cover opacity-80" 
+                      muted 
+                      playsInline
+                    />
+                    <div className="absolute w-12 h-12 rounded-full bg-teal-500/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Video className="w-6 h-6" />
+                    </div>
+                  </div>
+                ) : (
+                  <img 
+                    src={article.image || '/images/1.webp'} 
+                    alt={article.title?.[lang] || article.title?.GE || ''}
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                  />
+                )}
+
+                {/* მრავალენოვანი ბეიჯი სურათზე */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter text-teal-600 border border-teal-100">
+                  {categoryTranslations[article.category]?.[lang] || article.category}
+                </div>
               </div>
-              <h3 className="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-teal-600 transition-colors uppercase tracking-tighter">
-                {article.title[lang]}
-              </h3>
-              <p className="text-slate-500 text-xs font-bold leading-relaxed mb-6 line-clamp-3">
-                {article.excerpt[lang]}
-              </p>
-              <button className="mt-auto flex items-center gap-2 text-teal-600 font-black text-[10px] uppercase tracking-widest group/btn">
-                {lang === 'GE' ? 'სრულად ნახვა' : lang === 'EN' ? 'Read More' : 'Читать далее'}
-                <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </article>
-        ))}
+
+              <div className="p-8 flex flex-col flex-grow">
+                <div className="flex items-center gap-2 text-slate-400 text-[9px] font-black uppercase mb-4">
+                  <Calendar className="w-3 h-3" />
+                  {article.date}
+                </div>
+                <h3 className="text-xl font-black text-slate-900 leading-tight mb-4 group-hover:text-teal-600 transition-colors uppercase tracking-tighter">
+                  {article.title?.[lang] || article.title?.GE}
+                </h3>
+                <p className="text-slate-500 text-xs font-bold leading-relaxed mb-6 line-clamp-3">
+                  {article.excerpt?.[lang] || article.excerpt?.GE}
+                </p>
+                <button className="mt-auto flex items-center gap-2 text-teal-600 font-black text-[10px] uppercase tracking-widest group/btn">
+                  {lang === 'GE' ? 'სრულად ნახვა' : lang === 'EN' ? 'Read More' : 'Читать далее'}
+                  <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </article>
+          );
+        })}
       </div>
-
-      {filteredArticles.length === 0 && (
-        <div className="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
-          <BookOpen className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-          <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">
-            {lang === 'GE' ? 'სტატიები ვერ მოიძებნა' : lang === 'EN' ? 'No articles found' : 'Статьи не найдены'}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

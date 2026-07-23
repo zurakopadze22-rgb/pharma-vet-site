@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, CheckCircle2, Lightbulb, Share2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Calendar, Facebook, MessageCircle, Copy, Check, CheckCircle2, Lightbulb, Share2, Video } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { blogArticles } from '../data/blogData';
+import { getStoredArticles } from '../utils/blogStore';
 import { productsData } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
 import { useToast } from '../context/ToastContext';
@@ -10,14 +10,21 @@ const BlogDetail = ({ lang, t, onBack }) => {
   const { slug } = useParams();
   const [copied, setCopied] = useState(false);
   const { addToast } = useToast();
+  const [articles, setArticles] = useState(getStoredArticles());
 
-  const article = blogArticles.find(a => a.slug === slug);
+  useEffect(() => {
+    const handleUpdate = () => setArticles(getStoredArticles());
+    window.addEventListener('pharmavet_blogs_updated', handleUpdate);
+    return () => window.removeEventListener('pharmavet_blogs_updated', handleUpdate);
+  }, []);
+
+  const article = articles.find(a => a.slug === slug);
   const isArticleAvailable = !!article;
 
-  const articleTitle = isArticleAvailable ? article.title[lang] : '';
-  const articleExcerpt = isArticleAvailable ? article.excerpt[lang] : '';
+  const articleTitle = isArticleAvailable ? (article.title[lang] || article.title.GE || '') : '';
+  const articleExcerpt = isArticleAvailable ? (article.excerpt[lang] || article.excerpt.GE || '') : '';
   const articleImage = isArticleAvailable 
-    ? (article.image.startsWith('http') ? article.image : `https://www.pharmavet.ge${article.image}`)
+    ? (article.image && article.image.startsWith('http') ? article.image : (article.image ? `https://www.pharmavet.ge${article.image}` : ''))
     : '';
   const articleUrl = isArticleAvailable ? `https://www.pharmavet.ge/blog/${article.slug}` : '';
 
@@ -147,12 +154,22 @@ const BlogDetail = ({ lang, t, onBack }) => {
         
         {/* სურათის ბლოკი */}
         <div className="w-full lg:sticky lg:top-28">
-          <div className="relative rounded-[2rem] rounded-bl-none overflow-hidden shadow-xl shadow-teal-100/20 transform lg:-rotate-1">
-            <img 
-              src={article.image} 
-              alt={article.title[lang]} 
-              className="w-full h-[200px] md:h-[400px] object-cover" 
-            />
+          <div className="relative rounded-[2rem] rounded-bl-none overflow-hidden shadow-xl shadow-teal-100/20 transform lg:-rotate-1 bg-slate-900">
+            {(article.isVideo || article.mediaType === 'video' || (article.video && article.video.length > 0) || (typeof article.image === 'string' && (article.image.endsWith('.mp4') || article.image.endsWith('.webm') || article.image.startsWith('data:video')))) ? (
+              <video 
+                src={article.video || article.image} 
+                controls 
+                autoPlay 
+                muted 
+                className="w-full h-[220px] md:h-[400px] object-cover" 
+              />
+            ) : (
+              <img 
+                src={article.image} 
+                alt={article.title?.[lang] || article.title?.GE || ''} 
+                className="w-full h-[200px] md:h-[400px] object-cover" 
+              />
+            )}
           </div>
           
           {article.quickTip && (

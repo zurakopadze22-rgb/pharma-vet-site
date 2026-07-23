@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Package, BookOpen, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { productsData } from '../data/products';
-import { blogArticles } from '../data/blogData';
+import { getStoredProducts } from '../utils/productStore';
+import { getStoredArticles } from '../utils/blogStore';
 
 const SpotlightSearch = ({ isOpen, onClose, lang = 'GE' }) => {
   const [query, setQuery] = useState('');
@@ -37,9 +37,13 @@ const SpotlightSearch = ({ isOpen, onClose, lang = 'GE' }) => {
   const cleanQuery = query.toLowerCase().trim();
 
   // Search Products
+  const allProducts = getStoredProducts();
+  const allArticles = getStoredArticles();
+
+  // Search Products
   const filteredProducts = cleanQuery
-    ? productsData.filter((p) => {
-        const nameMatch = p.name[lang]?.toLowerCase().includes(cleanQuery) || p.name.GE.toLowerCase().includes(cleanQuery);
+    ? allProducts.filter((p) => {
+        const nameMatch = p.name?.[lang]?.toLowerCase().includes(cleanQuery) || p.name?.GE?.toLowerCase().includes(cleanQuery);
         const manufacturerMatch = p.manufacturer?.toLowerCase().includes(cleanQuery);
         const purposeMatch = p.purpose?.[lang]?.toLowerCase().includes(cleanQuery);
         return nameMatch || manufacturerMatch || purposeMatch;
@@ -48,8 +52,8 @@ const SpotlightSearch = ({ isOpen, onClose, lang = 'GE' }) => {
 
   // Search Blog Articles
   const filteredArticles = cleanQuery
-    ? blogArticles.filter((a) => {
-        const titleMatch = a.title[lang]?.toLowerCase().includes(cleanQuery) || a.title.GE.toLowerCase().includes(cleanQuery);
+    ? allArticles.filter((a) => {
+        const titleMatch = a.title?.[lang]?.toLowerCase().includes(cleanQuery) || a.title?.GE?.toLowerCase().includes(cleanQuery);
         const excerptMatch = a.excerpt?.[lang]?.toLowerCase().includes(cleanQuery);
         return titleMatch || excerptMatch;
       }).slice(0, 4)
